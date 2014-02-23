@@ -1,12 +1,3 @@
-type tipe = Int | String | Float | Boolean | Func of tipe * (tipe list);;
-
-let type_of_string = function
-  | "bool" -> Boolean
-  | "int" -> Int
-  | "string" -> String
-  | "float" -> Float 
-  | _ -> failwith "Invalid argument for type_of_string.";;
-
 type expression =
   | DeclAssign of string * tipe * expression (* int a = 3  *)
   | CtxDeclaration of string * expression (* a:=3 *)
@@ -20,25 +11,31 @@ type expression =
   | MultiplyOperator of expression * expression   (* a*b *)
   | DivOperator of expression * expression        (* a/b *)
   | ExponentOperator of expression * expression   (* a^b *)
-  | ModOperator of expression * expression;;      (* a%b *)
+  | ModOperator of expression * expression        (* a%b *)
 
-type argument = string * tipe;;
+  | Primitive of varValue
 
-type funct = tipe * (argument list) * (expression list);;
+and tipe = Int | String | Float | Boolean | Function of tipe * (tipe list)
+and argument = string * tipe
 
-type varValue =
+and func = Func of tipe * (argument list) * (expression list)
+
+and varValue =
   | ValInt of int
   | ValString of string
   | ValFloat of float
   | ValBoolean of bool
-  | ValFunction of funct
+  | ValFunction of func
   | Null
-  | Undefined;;
+  | Undefined
 
-type variable = tipe * varValue;;
+and variable = tipe * varValue;;
 
-type iexpr =
-  | Expression of expression
+let type_of_string = function
+  | "bool" -> Boolean
+  | "int" -> Int
+  | "string" -> String
+  | "float" -> Float 
+  | _ -> failwith "Invalid argument for type_of_string.";;
 
-  (* Any value typed directly into the interpreter, including functions *)
-  | Primitive of varValue;;
+

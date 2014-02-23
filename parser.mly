@@ -19,7 +19,7 @@
 %type <InterpreterObjects.expression> main
 %%
 main:
-    expr EOL        { $1 }
+    | expr EOL          { $1 }
 ;
 
 expr:
@@ -28,8 +28,12 @@ expr:
     | VARNAME TYPE_ASSIGN expr          { CtxDeclaration $1, $3 }
     | VARNAME ASSIGN expr               { Assignment $1, $3 }
     | callable LPAREN vallist RPAREN    { ApplyFunction $1, $3 }
-    | funcexpr                          { $1 }
     | LPAREN expr RPAREN                { $2 }
+;
+
+primitive:
+    | funcexpr      { $1 }
+    | INT           { $1 }
 ;
 
 exprSeq:
@@ -39,26 +43,26 @@ exprSeq:
 ;
 
 typematch:
-    | FUNC LPAREN typelist RPAREN typematch        { Func $5, $3 }
+    | FUNC LPAREN typelist RPAREN typematch        { Function $5, $3 }
     | TYPE                                          { $1 }
 ;
 
 typelist:
-    | typematch COMMA typelist  { Types $1, $3 }
-    | typematch                 { Types $1, (None:typeList) }
-    |                           { (None:typeList) }
+    | typematch COMMA typelist  { $1 :: $3 }
+    | typematch                 { [$1] }
+    |                           { [] }
 ;
 
 arglist:
-    | typematch VARNAME COMMA arglist   { Args (Argument $2, $1), $4 }
-    | typematch VARNAME                 { Args (Argument $2, $1), (None:argList) }
-    |                                   { (None:argList) }
+    | typematch VARNAME COMMA arglist   { (Argument $2, $1) :: $4 }
+    | typematch VARNAME                 { [(Argument $2, $1)] }
+    |                                   { [] }
 ;
 
 vallist:
-    | expr COMMA vallist    { Vals $1, $3 }
-    | expr                  { Vals $1, (None:valList) }
-    |                       { (None:valList) }
+    | expr COMMA vallist    { $1 :: $3 }
+    | expr                  { [$1] }
+    |                       { [] }
 ;
 
 callable:
@@ -68,9 +72,9 @@ callable:
 
 funcexpr:
  | FUNC VARNAME LPAREN arglist RPAREN typematch LBRACKET exprSeq RBRACKET {
-        CtxDeclaration $2, (Primitive (ValFunction (Function $6, $4, $8)))
+        CtxDeclaration $2, (Primitive (ValFunction (Func $6, $4, $8)))
     }
  | FUNC LPAREN arglist RPAREN typematch LBRACKET exprSeq RBRACKET {
-        Primitive (ValFunction (Function $5, $3, $7))
+        Primitive (ValFunction (Func $5, $3, $7))
     }
 
