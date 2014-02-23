@@ -1,14 +1,15 @@
 
-all:
-	ocamllex sdllexer.mll
-	ocamlyacc sdlparser.mly
-	ocamlc -c path.mli
-	ocamlc -c path.ml
-	ocamlc -c sdlparser.mli 
-	ocamlc -c sdllexer.ml
-	ocamlc -c sdlparser.ml
+all: objs
+	ocamllex lexer.mll
+	ocamlyacc parser.mly
+	ocamlc -c parser.mli
+	ocamlc -c lexer.ml
+	ocamlc -c parser.ml
 	ocamlc -c main.ml
-	ocamlc -o sdlc sdllexer.cmo sdlparser.cmo path.cmo main.cmo
+	ocamlc -o si lexer.cmo parser.cmo interpreterObjects.cmo main.cmo
+
+objs:
+	ocamlc -c interpreterObjects.ml
 
 clean:
-	rm sdlc *.cmo sdllexer.ml sdlparser.ml sdlparser.mli *.cmi
+	rm si *.cmo *.cmi lexer.ml parser.ml parser.mli

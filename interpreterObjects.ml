@@ -1,45 +1,44 @@
-type Expression =
-  | DeclAssign of string * Type * Expression (* int a = 3  *)
-  | CtxDeclaration of string * Expression (* a:=3 *)
-  | Assignment of string * Expression (* a = 4 *)
-  | VarName of string (* a // this needs to return the value of a *)
-  | ApplyFunction of string * ArgumentList        (* f(a, 3, b) *)
-
-  (* Operators *)
-  | PlusOperator of Expression * Expression       (* a+3 or a+b *)
-  | MinusOperator of Expression * Expression      (* a-b  *)
-  | MultiplyOperator of Expression * Expression   (* a*b *)
-  | DivOperator of Expression * Expression        (* a/b *)
-  | ExponentOperator of Expression * Expression   (* a^b *)
-  | ModOperator of Expression * Expression        (* a%b *)
-
-  (* Any value typed directly into the interpreter, including functions *)
-  | Primitive of VarValue
-
-  (* more expressions, useful for function bodies *)
-  | Sequence of Expression * Expression;;
-
-type Type = Int | String | Float | Boolean | Func of Type * TypeArgList;;
-type TypeArgList = None | ArgTypes of Type * TypeArgList;;
+type tipe = Int | String | Float | Boolean | Func of tipe * (tipe list);;
 
 let type_of_string = function
   | "bool" -> Boolean
   | "int" -> Int
   | "string" -> String
-  | "float" -> Float;;
+  | "float" -> Float 
+  | _ -> failwith "Invalid argument for type_of_string.";;
 
-type VarValue =
+type expression =
+  | DeclAssign of string * tipe * expression (* int a = 3  *)
+  | CtxDeclaration of string * expression (* a:=3 *)
+  | Assignment of string * expression (* a = 4 *)
+  | VarName of string (* a // this needs to return the value of a *)
+  | Applyfunction of string * (expression list)        (* f(a, 3, b) *)
+
+  (* Operators *)
+  | PlusOperator of expression * expression       (* a+3 or a+b *)
+  | MinusOperator of expression * expression      (* a-b  *)
+  | MultiplyOperator of expression * expression   (* a*b *)
+  | DivOperator of expression * expression        (* a/b *)
+  | ExponentOperator of expression * expression   (* a^b *)
+  | ModOperator of expression * expression;;      (* a%b *)
+
+type argument = string * tipe;;
+
+type funct = tipe * (argument list) * (expression list);;
+
+type varValue =
   | ValInt of int
   | ValString of string
   | ValFloat of float
   | ValBoolean of bool
-  | ValFunction of Function
+  | ValFunction of funct
   | Null
   | Undefined;;
 
-type Variable = string * Type * VarValue;;
+type variable = tipe * varValue;;
 
-type Function = Type * VariableList * Expression;;
-type VariableList = None | Vars of Variable * VariableList;; 
+type iexpr =
+  | Expression of expression
 
-
+  (* Any value typed directly into the interpreter, including functions *)
+  | Primitive of varValue;;
