@@ -11,15 +11,15 @@ rule token = parse
     (* primitive type matches, no func and stream *)
     | ['0'-'9']+ as lxm { INT(int_of_string lxm) }
 
-    | '{'   { LBRACKET }
-    | '}'  { RBRACKET }
-    | "func"   { FUNC }
+    | '{'       { LBRACKET }
+    | '}'       { RBRACKET }
+    | "func"    { FUNC }
 
-    | "="      { ASSIGN }
-    | ":="     { TYPE_ASSIGN }
+    | "="       { ASSIGN }
+    | ":="      { TYPE_ASSIGN }
 
-    | '('      { LPAREN }
-    | ')'      { RPAREN }
+    | '('       { LPAREN }
+    | ')'       { RPAREN }
 
     | '+'       { PLUS }
     | '-'       { MINUS }

@@ -21,9 +21,13 @@ main:
 ;
 
 expr:
-        | TYPEMATCH
-        | funcexpr                      { Assignment Expression (Primitive (VarValue $1)) }
+        | typematch VARNAME             { DeclAssign $2 $1 Undefined }
+        | typematch VARNAME ASSIGN expr { DeclAssign $2 $1 $4 }
+        | VARNAME TYPE_ASSIGN expr      { CtxDeclaration $1 $3 }
+        | VARNAME ASSIGN expr           { Assignment $1 $3 }
+        | funcexpr                      { $1 }
         | LPAREN expr RPAREN            { $2 }
+        | VARNAME LPAREN arglist RPAREN { ApplyFunction $1 $3 }
         | expr expr                     { Seq ($1, $2) }
 ;
 
@@ -39,4 +43,10 @@ typelist:
 ;
 
 funcexpr:
- | FUNC VARNAME LPARAN varlist RPARAN TYPE LBRACKET expr RBRACKET { Function $2 $4 $7 }
+ | FUNC VARNAME LPAREN varlist RPAREN typematch LBRACKET expr RBRACKET {
+        CtxDeclaration $2 (Primitive (ValFunction (Function $6 $4 $8)))
+    }
+ | FUNC LPAREN varlist RPAREN typematch LBRACKET expr RBRACKET {
+        Primitive (ValFunction (Function $5 $3 $7))
+    }
+
