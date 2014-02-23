@@ -4,6 +4,7 @@ open Parser
 open InterpreterObjects
 exception Eof
 }
+
 rule token = parse
       [' ' '\t']     { token lexbuf }     (* skip blanks *)
     | ['\n' ]  { EOL }

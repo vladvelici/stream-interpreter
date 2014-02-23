@@ -23,27 +23,31 @@ main:
 ;
 
 expr:
-    | typematch VARNAME ASSIGN expr     { DeclAssign $2, $1, $4 }
-    | typematch VARNAME                 { DeclAssign $2, $1, Undefined }
-    | VARNAME TYPE_ASSIGN expr          { CtxDeclaration $1, $3 }
-    | VARNAME ASSIGN expr               { Assignment $1, $3 }
-    | callable LPAREN vallist RPAREN    { ApplyFunction $1, $3 }
+    | primitive                         { Primitive ($1) }
+    | funcexpr                          { $1 }
+    | typematch VARNAME ASSIGN expr     { DeclAssign ($2, $1, $4) }
+    | typematch VARNAME                 { DeclAssign ($2, $1, Primitive Undefined) }
+    | VARNAME TYPE_ASSIGN expr          { CtxDeclaration ($1, $3) }
+    | VARNAME ASSIGN expr               { Assignment ($1, $3) }
+    | VARNAME LPAREN vallist RPAREN     { ApplyFunction ($1, $3) }
+    | lambda LPAREN vallist RPAREN      { ApplyLambda ($1, $3) }
     | LPAREN expr RPAREN                { $2 }
+    | VARNAME                           { VarName $1 } 
 ;
 
+/* primitives excluding functions */
 primitive:
-    | funcexpr      { $1 }
-    | INT           { $1 }
+    | INT           { ValInt $1 }
 ;
 
 exprSeq:
-    | expr EOL exprSeq  { Sequence $1, $3 }
-    | expr              { Sequence $1, (None:expSequence) }
-    |                   { (None:expSequence) }
+    | expr EOL exprSeq  { $1 :: $3 }
+    | expr              { [$1] }
+    |                   { [] }
 ;
 
 typematch:
-    | FUNC LPAREN typelist RPAREN typematch        { Function $5, $3 }
+    | FUNC LPAREN typelist RPAREN typematch        { Function ($5, $3) }
     | TYPE                                          { $1 }
 ;
 
@@ -54,8 +58,8 @@ typelist:
 ;
 
 arglist:
-    | typematch VARNAME COMMA arglist   { (Argument $2, $1) :: $4 }
-    | typematch VARNAME                 { [(Argument $2, $1)] }
+    | typematch VARNAME COMMA arglist   { (Argument ($2, $1)) :: $4 }
+    | typematch VARNAME                 { [(Argument ($2, $1))] }
     |                                   { [] }
 ;
 
@@ -65,16 +69,13 @@ vallist:
     |                       { [] }
 ;
 
-callable:
-    | funcexpr  { $1 }
-    | VARNAME   { $1 }
+funcexpr:
+    | FUNC VARNAME LPAREN arglist RPAREN typematch LBRACKET exprSeq RBRACKET {
+            CtxDeclaration ($2, (Primitive (ValFunction (Func ($6, $4, $8)))))
+        }
+    | lambda { Primitive (ValFunction ($1)) }
 ;
 
-funcexpr:
- | FUNC VARNAME LPAREN arglist RPAREN typematch LBRACKET exprSeq RBRACKET {
-        CtxDeclaration $2, (Primitive (ValFunction (Func $6, $4, $8)))
-    }
- | FUNC LPAREN arglist RPAREN typematch LBRACKET exprSeq RBRACKET {
-        Primitive (ValFunction (Func $5, $3, $7))
-    }
-
+lambda:
+    | FUNC LPAREN arglist RPAREN typematch LBRACKET exprSeq RBRACKET { Func ($5, $3, $7) }
+;

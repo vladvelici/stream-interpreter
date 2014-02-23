@@ -1,23 +1,26 @@
 open InterpreterObjects 
 
-let string_of_expression = function
-    | DeclAssign (name, ty, exp) -> (string_of_type ty) ^ " " ^ name ^ " = [" ^ (prettyPrint exp) ^ "]"
-    | CtxDeclaration (name, exp) -> name ^ ":=" ^ "["^(prettyPrint exp)^"]"
-    | Assignment (name, exp) -> name ^ " = ["^(prettyPrint exp)^"]"
+let rec string_of_expression = function
+    | DeclAssign (name, ty, exp) -> (string_of_type ty) ^ " " ^ name ^ " = [" ^ (string_of_expression exp) ^ "]"
+    | CtxDeclaration (name, exp) -> name ^ ":=" ^ "["^(string_of_expression exp)^"]"
+    | Assignment (name, exp) -> name ^ " = ["^(string_of_expression exp)^"]"
     | VarName name -> name
-    | _ -> "not yet implemented";;
-;;
+    | _ -> "not yet implemented"
 
-let string_of_type = function
+
+and string_of_type = function
     | Int -> "int"
     | Float -> "float"
     | Boolean -> "bool"
     | String -> "string"
-    | Func (a, b) -> "func(" ^ (string_of_ArgList b) ^ ")" ^ (string_of_type a);;
+    | Function (a, b) -> "func(" ^ (string_of_ArgList b) ^ ")" ^ (string_of_type a)
 
-let string_of_ArgList = function
-    | None -> ""
-    | Args (a, b) -> (string_of_type a) ^ "," ^ (string_of_ArgList b);;
+and string_of_ArgList = function
+    | [] -> ""
+    | a :: b -> (string_of_type a) ^ "," ^ (string_of_ArgList b)
+
+and prettyPrint exp = print_string (" ** " ^ (string_of_expression exp));;
+
 
 let _ = 
   try

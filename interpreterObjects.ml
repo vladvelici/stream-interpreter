@@ -1,22 +1,23 @@
 type expression =
-  | DeclAssign of string * tipe * expression (* int a = 3  *)
-  | CtxDeclaration of string * expression (* a:=3 *)
-  | Assignment of string * expression (* a = 4 *)
-  | VarName of string (* a // this needs to return the value of a *)
-  | Applyfunction of string * (expression list)        (* f(a, 3, b) *)
+  | DeclAssign of string * tipe * expression        (* int a = 3  *)
+  | CtxDeclaration of string * expression           (* a:=3 *)
+  | Assignment of string * expression               (* a = 4 *)
+  | VarName of string                               (* a *)
+  | ApplyFunction of string * (expression list)     (* f(a, 3, b) *)
+  | ApplyLambda of func * (expression list)         (* (func...)(arg) *)
 
   (* Operators *)
-  | PlusOperator of expression * expression       (* a+3 or a+b *)
-  | MinusOperator of expression * expression      (* a-b  *)
-  | MultiplyOperator of expression * expression   (* a*b *)
-  | DivOperator of expression * expression        (* a/b *)
-  | ExponentOperator of expression * expression   (* a^b *)
-  | ModOperator of expression * expression        (* a%b *)
+  | PlusOperator of expression * expression         (* a+3 or a+b *)
+  | MinusOperator of expression * expression        (* a-b  *)
+  | MultiplyOperator of expression * expression     (* a*b *)
+  | DivOperator of expression * expression          (* a/b *)
+  | ExponentOperator of expression * expression     (* a^b *)
+  | ModOperator of expression * expression          (* a%b *)
 
   | Primitive of varValue
 
 and tipe = Int | String | Float | Boolean | Function of tipe * (tipe list)
-and argument = string * tipe
+and argument = Argument of string * tipe
 
 and func = Func of tipe * (argument list) * (expression list)
 
