@@ -6,7 +6,7 @@
 %token <string> VARNAME
 %token <InterpreterObjects.tipe> TYPE
 %token ASSIGN TYPE_ASSIGN
-%token LPAREN RPAREN LBRACKET RBRACKET
+%token LPAREN RPAREN LBRACE RBRACE
 %token PLUS MINUS MODULO DIV TIMES EXPONENTIAL
 %token COMMA
 %token FUNC
@@ -31,7 +31,6 @@ expr:
     | VARNAME ASSIGN expr               { Assignment ($1, $3) }
     | VARNAME LPAREN vallist RPAREN     { ApplyFunction ($1, $3) }
     | lambda LPAREN vallist RPAREN      { ApplyLambda ($1, $3) }
-    | LPAREN expr RPAREN                { $2 }
     | VARNAME                           { VarName $1 } 
 ;
 
@@ -44,6 +43,7 @@ exprSeq:
     | expr EOL exprSeq  { $1 :: $3 }
     | expr              { [$1] }
     |                   { [] }
+    | EOL exprSeq       { $2 }
 ;
 
 typematch:
@@ -70,12 +70,12 @@ vallist:
 ;
 
 funcexpr:
-    | FUNC VARNAME LPAREN arglist RPAREN typematch LBRACKET exprSeq RBRACKET {
+    | FUNC VARNAME LPAREN arglist RPAREN typematch LBRACE exprSeq RBRACE {
             CtxDeclaration ($2, (Primitive (ValFunction (Func ($6, $4, $8)))))
         }
     | lambda { Primitive (ValFunction ($1)) }
 ;
 
 lambda:
-    | FUNC LPAREN arglist RPAREN typematch LBRACKET exprSeq RBRACKET { Func ($5, $3, $7) }
+    | FUNC LPAREN arglist RPAREN typematch LBRACE exprSeq RBRACE { Func ($5, $3, $7) }
 ;

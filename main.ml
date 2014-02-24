@@ -23,10 +23,12 @@ and prettyPrint exp = print_string (" ** " ^ (string_of_expression exp));;
 
 
 let _ = 
-  try
-    let lexbuf = Lexing.from_channel stdin 
-    in  
-       let result = Parser.main Lexer.token lexbuf 
-       in
-         prettyPrint result ; print_newline() ; flush stdout 
-  with Parsing.Parse_error -> print_string "There was a problem parsing the SDL program. Please check your syntax. \n" ; flush stdout
+    try (
+        let lexbuf = Lexing.from_channel stdin 
+        in while true do
+            try
+                let result = Parser.main Lexer.token lexbuf 
+                in prettyPrint result ; print_newline() ; flush stdout 
+           with Parsing.Parse_error -> print_string "Parsing error. Sorry. \n"; flush stdout
+        done
+    ) with Lexer.Eof -> print_string "Bye :-h\n" ; flush stdout ; exit 0;
