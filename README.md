@@ -1,6 +1,14 @@
 stream-interpreter
 ==================
 
+Compiling:
+
+    make depend
+    make
+
+Make depend is required only once or after changes
+that might influence the dependency of files.
+
 Names of variables and functions
 --------------------------------
 

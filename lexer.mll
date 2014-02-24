@@ -1,7 +1,7 @@
 (* File lexer.mll *)
 {
-open Parser
 open InterpreterObjects
+open Parser
 exception Eof
 }
 
