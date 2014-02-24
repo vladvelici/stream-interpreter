@@ -9,3 +9,9 @@
 *.cmxa
 *.swp
 .depend
+interpreterObjects.mli
+lexer.ml
+parser.ml
+parser.mli
+parser.output
+runinterp
