@@ -24,58 +24,76 @@ main:
 
 expr:
     | primitive                         { Primitive ($1) }
-    | funcexpr                          { $1 }
-    | typematch VARNAME ASSIGN expr     { DeclAssign ($2, $1, $4) }
-    | typematch VARNAME                 { DeclAssign ($2, $1, Primitive Undefined) }
-    | VARNAME TYPE_ASSIGN expr          { CtxDeclaration ($1, $3) }
+    | declaration                       { $1 }
     | VARNAME ASSIGN expr               { Assignment ($1, $3) }
     | VARNAME LPAREN vallist RPAREN     { ApplyFunction ($1, $3) }
     | lambda LPAREN vallist RPAREN      { ApplyLambda ($1, $3) }
     | VARNAME                           { VarName $1 } 
 ;
 
-/* primitives excluding functions */
-primitive:
-    | INT           { ValInt $1 }
+/* Matches the following:
+ * int a = 3
+ * int a
+ * a := 3
+ * func <name> (<arg>) <retType> { <body> }
+*/
+
+declaration:
+    | typematch VARNAME ASSIGN expr     { DeclAssign ($2, $1, $4) }
+    | typematch VARNAME                 { DeclAssign ($2, $1, Primitive Undefined) }
+    | VARNAME TYPE_ASSIGN expr          { CtxDeclaration ($1, $3) }
+    | funcexpr                          { $1 }
 ;
 
+
+/* primitives */
+primitive:
+    | INT           { ValInt $1 }
+    | lambda        { ValFunction ($1) }
+;
+
+/* Sequence of expressions, used in functions */
 exprSeq:
+    | EOL exprSeq       { $2 }
     | expr EOL exprSeq  { $1 :: $3 }
     | expr              { [$1] }
     |                   { [] }
-    | EOL exprSeq       { $2 }
 ;
 
+/* matches a type (return InterpreterObjects.tipe) */
 typematch:
     | FUNC LPAREN typelist RPAREN typematch        { Function ($5, $3) }
     | TYPE                                          { $1 }
 ;
 
+/* list of types */
 typelist:
     | typematch COMMA typelist  { $1 :: $3 }
     | typematch                 { [$1] }
     |                           { [] }
 ;
-
+/* list of arguments. An argument is a pair (type, varname) */
 arglist:
     | typematch VARNAME COMMA arglist   { (Argument ($2, $1)) :: $4 }
     | typematch VARNAME                 { [(Argument ($2, $1))] }
     |                                   { [] }
 ;
 
+/* list of expressions, used for calling a function */
 vallist:
     | expr COMMA vallist    { $1 :: $3 }
     | expr                  { [$1] }
     |                       { [] }
 ;
 
+/* matches things like func <function name>(<arguments>) <return type> { <some-body> } */
 funcexpr:
     | FUNC VARNAME LPAREN arglist RPAREN typematch LBRACE exprSeq RBRACE {
             CtxDeclaration ($2, (Primitive (ValFunction (Func ($6, $4, $8)))))
         }
-    | lambda { Primitive (ValFunction ($1)) }
 ;
 
+/* matches lambda expressions: func(<arguments>) <return type> { <some body> }*/
 lambda:
     | FUNC LPAREN arglist RPAREN typematch LBRACE exprSeq RBRACE { Func ($5, $3, $7) }
 ;
