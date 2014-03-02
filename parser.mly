@@ -62,7 +62,8 @@ exprSeq:
 
 /* matches a type (return InterpreterObjects.tipe) */
 typematch:
-    | FUNC LPAREN typelist RPAREN typematch        { Function ($5, $3) }
+    | FUNC LPAREN typelist RPAREN typematch         { Function ($5, $3) }
+    | FUNC LPAREN RPAREN typematch                  { Function ($4, []) }
     | TYPE                                          { $1 }
 ;
 
