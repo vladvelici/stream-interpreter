@@ -95,5 +95,6 @@ funcexpr:
 
 /* matches lambda expressions: func(<arguments>) <return type> { <some body> }*/
 lambda:
-    | FUNC LPAREN arglist RPAREN typematch LBRACE exprSeq RBRACE { Func ($5, $3, $7) }
+     | FUNC LPAREN arglist RPAREN typematch LBRACE exprSeq RBRACE { Func($5, $3, $7) }
+     | FUNC LPAREN RPAREN typematch LBRACE exprSeq RBRACE { Func ($4, [], $6) }
 ;
