@@ -1,5 +1,6 @@
 open InterpreterObjects
 open Environment
+open Native
 
 exception CannotRedefineVariable of string;;
 exception UndefinedVariable of string;;
@@ -95,8 +96,9 @@ and eval_func_body scope body : varValue= match body with
     | expr :: [] -> eval expr scope
     | expr :: exprList -> eval expr scope; eval_func_body scope exprList
 
-and apply_function call_scope decl_scope f params =
-    match f with Func (retrunType, arguments, body) ->
+and apply_function call_scope decl_scope f params = match f with
+    | NativeFunc (name, arguments) -> run_native_code name params 
+    | Func (retrunType, arguments, body) ->
         if (validate_parameters arguments params call_scope) then
             let func_scope = new_environment decl_scope
             in apply_param_bindings func_scope call_scope params arguments; eval_func_body func_scope body

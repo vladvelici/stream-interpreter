@@ -1,0 +1,9 @@
+int m = no_of_inputs()
+int n = input_length()
+
+for (int i=0, i<m, i=i+1) {
+    stream s = get(i)
+    remove(s)
+    remove(s)
+    output(s)
+}

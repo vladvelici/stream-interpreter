@@ -9,7 +9,8 @@ type environment =
 let new_environment parent = Environment (parent, (Hashtbl.create 10));;
 
 (* lookup_variable_all reutrns the variable /tipe * varVal/ and the environment where it's defined *)
-let rec lookup_variable_all env varname = match env with
+let rec lookup_variable_all env varname = 
+    match env with
     | RootEnv ht -> (env, Hashtbl.find ht varname)
     | Environment (p, ht) -> try ( (env, Hashtbl.find ht varname) ) with Not_found -> lookup_variable_all p varname;;
 
@@ -34,19 +35,3 @@ let update_variable env varname var =
     let varEnv = lookup_variable_environment env varname
     in put_variable varEnv varname var;;
 
-
-(*
-let root = RootEnv (Hashtbl.create 10);;
-let env1 = new_environment root;; 
-
-put_variable root "a" 43;;
-put_variable root "b" 2;;
-put_variable env1 "c" 55;;
-put_variable env1 "d" 66;;
-
-let va = lookup_variable env1 "a";;
-
-match va with (_, v) -> print_int v;;
-
-print_string "\n";;
-*)
