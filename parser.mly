@@ -49,6 +49,8 @@ declaration:
 /* primitives */
 primitive:
     | INT           { ValInt $1 }
+    | TRUE          { ValBoolean true }
+    | FALSE         { ValBoolean false }
     | lambda        { ValFunction ($1) }
 ;
 
