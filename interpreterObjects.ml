@@ -16,7 +16,7 @@ type expression =
 
   | Primitive of varValue
 
-and tipe = Int | String | Float | Boolean | Function of tipe * (tipe list)
+and tipe = Int | String | Float | Boolean | Function of tipe * (tipe list) | Unit
 and argument = Argument of string * tipe
 
 and func = Func of tipe * (argument list) * (expression list)
