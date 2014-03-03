@@ -47,7 +47,7 @@ let rec validate_parameters args params env = match args, params with
 (* EVALUATION *)
 let rec eval exp env = match exp with
     | DeclAssign (name, t, expr) -> let expr_type = typeOf expr env in 
-        if expr_type = t then
+        if expr_type = t || expr = Primitive Undefined then
             do_declare_assig env name t expr
         else 
             raise (IncompatibleTypes (t, expr_type))
@@ -57,6 +57,7 @@ let rec eval exp env = match exp with
     | ApplyLambda (f, params) -> apply_function env env f params
     | ApplyFunction (name, params) -> let (decl_scope, (varType, f)) = lookup_variable_all env name
         in if (is_function varType) then apply_function env decl_scope (func_of_varval f) params else raise (NotAFunction name) 
+    | Primitive p -> p
     | tmp -> raise (NotYetImplemented tmp)
 
 and func_of_varval = function
