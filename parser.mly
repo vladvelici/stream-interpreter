@@ -10,6 +10,7 @@
 %token PLUS MINUS MODULO DIV TIMES EXPONENTIAL
 %token COMMA
 %token FUNC
+%token TRUE FALSE
 %left PLUS MINUS        /* lowest precedence */
 %left MODULO
 %left TIMES DIV       /* medium precedence */

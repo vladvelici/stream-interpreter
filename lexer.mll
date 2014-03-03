@@ -31,6 +31,9 @@ rule token = parse
 
     | ','       { COMMA }
 
+    | "true"    { TRUE }
+    | "false"   { FALSE }
+
     | "int" | "string" | "float" | "bool" as lxm { TYPE(type_of_string lxm) }
     | ['a'-'z''A'-'Z''_']['a'-'z''A'-'Z''_''0'-'9']* as lxm { VARNAME(lxm) }
     | eof      { raise Eof }

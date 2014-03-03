@@ -13,7 +13,7 @@
 
 # These are the object files needed to rebuild the main executable file
 #
-OBJS = interpreterObjects.cmo parser.cmo lexer.cmo printer.cmo main.cmo
+OBJS = interpreterObjects.cmo parser.cmo lexer.cmo printer.cmo environment.cmo eval2.cmo main.cmo
 
 # Files that need to be generated from other files
 DEPEND += lexer.ml parser.ml interpreterObjects.mli 
