@@ -5,6 +5,7 @@ type environment =
     | RootEnv of (string, variable) Hashtbl.t
     | Environment of environment * (string, variable) Hashtbl.t
 ;;
+ 
 
 let new_environment parent = Environment (parent, (Hashtbl.create 10));;
 

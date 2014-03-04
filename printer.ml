@@ -12,6 +12,7 @@ let rec string_of_expression = function
             | ValFloat v -> string_of_float v
             | ValBoolean v -> string_of_bool v
             | ValFunction v -> string_of_func v
+            | ValStream s -> "stream"
             | Null -> "Null"
             | Undefined -> "Undefined"
     )
@@ -20,6 +21,7 @@ let rec string_of_expression = function
 and string_of_func = function
     | Func (tipe, arg, exprList) -> "func (" ^ (string_of_ArgList arg) ^ ") " ^ (string_of_type tipe) ^
         " { " ^ (string_of_exprList exprList) ^ "}"
+    | NativeFunc (tipe, _, typeList) -> "native func (" ^ (string_of_TypeList typeList) ^ ") " ^ (string_of_type tipe) 
 
 and string_of_type = function
     | Int -> "<int>"
@@ -27,6 +29,7 @@ and string_of_type = function
     | Boolean -> "<bool>"
     | String -> "<string>"
     | Unit -> "<Unit>"
+    | Stream _ -> "<Stream>"
     | Function (a, b) -> "<func (" ^ (string_of_TypeList b) ^ ") " ^ (string_of_type a) ^ ">"
 
 and string_of_TypeList = function

@@ -9,6 +9,7 @@ exception UninitializedVariable of string;;
 exception IncompatibleTypes of tipe * tipe;; (* Expected tipe 1, found tipe 2 *)
 exception NotAFunction of string;;
 exception NotYetImplemented of expression;;
+exception NotAStream;;
 
 (* typeOf expression in some environment *)
 let rec typeOf exp env = match exp with 
@@ -18,6 +19,8 @@ let rec typeOf exp env = match exp with
     | VarName a -> lookup_variable_type env a
     | ApplyFunction (name, _) -> returnType (lookup_variable_type env name) name
     | ApplyLambda (fnc, _) -> returnType (typeOf (Primitive (ValFunction fnc)) env) "-lambda-"
+    | NewStream expr -> Stream (returnType (typeOf expr env) "-newstream-")
+    | ReadStream expr -> returnTypeStream expr env
     | Primitive (ValInt _) -> Int
     | Primitive (ValFloat _) -> Float
     | Primitive (ValBoolean _) -> Boolean
@@ -26,10 +29,22 @@ let rec typeOf exp env = match exp with
     | Primitive (ValFunction (Func (t, arglist, _))) -> Function (t, (typelist_of_arglist arglist))
     | _ -> raise (NotYetImplemented exp)
 
+
+and is_stream expr env = match expr with
+    | NewStream _ -> true
+    | VarName name -> (match (lookup_variable_type env name) with Stream _ -> true | _ -> false)
+    | Primitive (ValStream _) -> true
+    | _ -> false
+
 (* return type of a given function *)
 and returnType fnc name = match fnc with
     | Function (t, _) -> t
     | _ -> raise (NotAFunction name)
+
+and returnTypeStream expr env = match expr with
+    | NewStream _ -> let stream = typeOf expr env in (match stream with Stream t -> t | _ -> raise NotAStream)
+    | VarName name -> let stream = typeOf expr env in (match stream with Stream t -> t | _ -> raise NotAStream)
+    | _ -> raise NotAStream
 
 (* helpers for working with functions *)
 and value_of_var = function (_, v) -> v
@@ -49,13 +64,13 @@ and typelist_of_arglist = function
 let rec validate_parameters args params env = match args, params with
     | [], [] -> true
     | Argument(_, t_arg) :: arglist, expr :: paramlist -> (types_compatible t_arg (typeOf expr env)) && (validate_parameters arglist paramlist env)
-    | _, _ -> false;;
+    | _, _ -> false
 
 (* check if t1 is compatible with t2 (a variable of t1 can accept a t2). Undefined and Null have type Unit which is accepted by any type *)
-let types_compatible t1 t2 = t1 = t2 || t2 = Unit;;
+and types_compatible t1 t2 = t1 = t2 || t2 = Unit
 
 (* check if t1 is the same as t2. Undefined and Null (type Unit) are not accepted as valid types for t2 *)
-let types_identical t1 t2 = t1 = t2;;
+and types_identical t1 t2 = t1 = t2
 
 (* EVALUATION *)
 let rec eval exp env = match exp with
@@ -70,8 +85,21 @@ let rec eval exp env = match exp with
     | ApplyLambda (f, params) -> apply_function env env f params
     | ApplyFunction (name, params) -> let (decl_scope, (varType, f)) = lookup_variable_all env name
         in if (is_function varType) then apply_function env decl_scope (func_of_varval f) params else raise (NotAFunction name) 
+    | NewStream expr -> create_new_stream expr env
+    | ReadStream expr -> if is_stream expr env then (let stream = eval expr env in read_stream stream) else raise (NotAStream)
     | Primitive p -> p
     | tmp -> raise (NotYetImplemented tmp)
+
+and read_stream stream = match stream with
+    | ValStream s -> (try (Stream.next s) with Stream.Failure -> Null)
+
+(* create new stream *)
+and create_new_stream expr env =
+    let stream_const = (
+        match expr with
+        | Primitive (ValFunction f) -> internal_new_stream env f
+        | VarName name -> let (scope, (_, (ValFunction f))) = lookup_variable_all env name in internal_new_stream scope f
+    ) in ValStream (Stream.from stream_const) 
 
 (* helper function to return the function from a varValue *)
 and func_of_varval = function
@@ -119,12 +147,16 @@ and eval_func_body scope body : varValue= match body with
 
 (* calls the given function in the given call_scope. Note that the function scope inherits the declaration scope, not the call scope. *)
 and apply_function call_scope decl_scope f params = match f with
-    | NativeFunc (name, arguments) -> run_native_code name params 
+    | NativeFunc (_, name, arguments) -> run_native_code name params 
     | Func (retrunType, arguments, body) ->
         if (validate_parameters arguments params call_scope) then
             let func_scope = new_environment decl_scope
             in apply_param_bindings func_scope call_scope params arguments; eval_func_body func_scope body
         else raise (IncompatibleTypes (Unit, Unit))
+
+and internal_new_stream decl_scope f count =
+    let return = eval (ApplyLambda (f, [Primitive (ValInt count)])) decl_scope  
+    in if return = Undefined then None else Some return
 ;;
 
 

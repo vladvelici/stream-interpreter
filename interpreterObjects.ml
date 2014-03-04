@@ -6,6 +6,9 @@ type expression =
   | ApplyFunction of string * (expression list)     (* f(a, 3, b) *)
   | ApplyLambda of func * (expression list)         (* (func...)(arg) *)
 
+  | NewStream of expression                         (* ~f or ~func(int x) int {...} *)
+  | ReadStream of expression                        (*  *)
+
   (* Operators *)
   | PlusOperator of expression * expression         (* a+3 or a+b *)
   | MinusOperator of expression * expression        (* a-b  *)
@@ -16,10 +19,10 @@ type expression =
 
   | Primitive of varValue
 
-and tipe = Int | String | Float | Boolean | Function of tipe * (tipe list) | Unit
+and tipe = Int | String | Float | Boolean | Function of tipe * (tipe list) | Stream of tipe | Unit
 and argument = Argument of string * tipe
 
-and func = Func of tipe * (argument list) * (expression list) | NativeFunc of string * (tipe list)
+and func = Func of tipe * (argument list) * (expression list) | NativeFunc of tipe * string * (tipe list)
 
 and varValue =
   | ValInt of int
@@ -27,6 +30,7 @@ and varValue =
   | ValFloat of float
   | ValBoolean of bool
   | ValFunction of func
+  | ValStream of varValue Stream.t
   | Null
   | Undefined
 

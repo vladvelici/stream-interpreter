@@ -8,13 +8,16 @@
 %token ASSIGN TYPE_ASSIGN
 %token LPAREN RPAREN LBRACE RBRACE
 %token PLUS MINUS MODULO DIV TIMES EXPONENTIAL
-%token COMMA
-%token FUNC
+%token COMMA COLON
+%token FUNC STREAM
+%token TILDE LCHEVRONS
 %token TRUE FALSE
 %left PLUS MINUS        /* lowest precedence */
 %left MODULO
 %left TIMES DIV       /* medium precedence */
 %left EXPONENTIAL
+%nonassoc LCHEVRONS
+%nonassoc TILDE
 %token EOL
 %start main             /* the entry point */
 %type <InterpreterObjects.expression> main
@@ -29,8 +32,14 @@ expr:
     | VARNAME ASSIGN expr               { Assignment ($1, $3) }
     | VARNAME LPAREN vallist RPAREN     { ApplyFunction ($1, $3) }
     | lambda LPAREN vallist RPAREN      { ApplyLambda ($1, $3) }
-    | VARNAME                           { VarName $1 } 
+    | VARNAME                           { VarName $1 }
+    | streams                           { $1 }
 ;
+
+/* Stream arithmetic */
+streams:
+    | TILDE expr                        { NewStream $2 }
+    | LCHEVRONS expr                    { ReadStream $2 }
 
 /* Matches the following:
  * int a = 3
@@ -67,6 +76,7 @@ exprSeq:
 typematch:
     | FUNC LPAREN typelist RPAREN typematch         { Function ($5, $3) }
     | FUNC LPAREN RPAREN typematch                  { Function ($4, []) }
+    | STREAM COLON typematch                        { Stream $3 }
     | TYPE                                          { $1 }
 ;
 

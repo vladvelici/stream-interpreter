@@ -7,8 +7,8 @@ open Eval2
 
 let roottbl:((string, variable) Hashtbl.t)  = Hashtbl.create 10;;
 
-Hashtbl.replace roottbl "input_length" (Function (Int, []), (ValFunction (NativeFunc ("input_length", []))));;
-Hashtbl.replace roottbl "get_input" (Function (Int ,[]), (ValFunction (NativeFunc ("get_input", [Int]))));;
+Hashtbl.replace roottbl "input_length" (Function (Int, []), (ValFunction (NativeFunc (Int, "input_length", []))));;
+Hashtbl.replace roottbl "get_input" (Function (Int ,[]), (ValFunction (NativeFunc (Int, "get_input", [Int]))));;
 
 let root = RootEnv roottbl;;
 

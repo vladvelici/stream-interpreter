@@ -15,6 +15,11 @@ rule token = parse
     | '{'       { LBRACE }
     | '}'       { RBRACE }
     | "func"    { FUNC }
+    | "stream"  { STREAM }
+
+    | ":"       { COLON }
+    | "<<"      { LCHEVRONS }
+    | "~"       { TILDE }
 
     | "="       { ASSIGN }
     | ":="      { TYPE_ASSIGN }
