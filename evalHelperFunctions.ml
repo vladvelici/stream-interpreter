@@ -80,8 +80,9 @@ let greaterEqual n1 n2 = ValBoolean (match n1, n2 with
   | ValFloat n1, ValInt n2 -> n1 >= (float_of_int n2)
   | ValFloat n1, ValFloat n2 -> n1 >= n2
   | _ , _ -> raise (IncompatibleTypes (Unit, Unit)));;
+
 (* Check if the expression is of type boolean and return it if it is *)
 let bool_check t = match t with
-  | Primitive (ValBoolean b) -> b
+  | ValBoolean b -> b
   | _ -> raise (IncompatibleTypes (Boolean, Unit));;
 

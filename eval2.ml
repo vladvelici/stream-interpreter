@@ -43,37 +43,45 @@ let rec eval exp env = match exp with
   | GreaterEqual (e1, e2) -> greaterEqual (eval e1 env) (eval e2 env)
 
   (* Boolean logic operators *)
-  | Not e -> let valb = (eval e env) in (match valb with ValBoolean b -> ValBoolean (not b) | raise IncompatibleTypes Boolean (typeOf valb env))
-  | Or (e1, e2) -> (eval e1 env) || (eval e2 env) (* We may or may not need this ValBoolean there *)
-  | And (e1, e2) -> (eval e1 env) && (eval e2 env) (* We may or may not need this ValBoolean there *)
+  | Not e -> let valb = (eval e env) in (match valb with ValBoolean b -> ValBoolean (not b) | _ -> raise (IncompatibleTypes (Boolean, (typeOf (Primitive valb) env))))
+  | Or (e1, e2) -> if (typeOf e1 env) = Boolean && (typeOf e2 env) = Boolean then
+      let (ValBoolean val1) = (eval e1 env) and (ValBoolean val2) = (eval e2 env) in (ValBoolean (val1 || val2))
+  else
+      raise (IncompatibleTypes (Boolean, Unit))
+    | And (e1, e2) -> if (typeOf e1 env) = Boolean && (typeOf e2 env) = Boolean then
+        let (ValBoolean val1) = (eval e1 env) and (ValBoolean val2) = (eval e2 env) in (ValBoolean (val1 && val2))
+    else
+        raise (IncompatibleTypes (Boolean, Unit))
 
   (* If statement operators *)
-  | If (e1, e2) -> if (eval e1 env) then (eval e2 env)
-  | IfElse (e1, e2, e3) -> if (eval e1 env) then (eval e2 env) else (eval e3 env)
+  | If (e1, e2) -> if bool_check (eval e1 env) then (eval_func_body env e2)  else Undefined
+  | IfElse (e1, e2, e3) -> if bool_check (eval e1 env) then (eval_func_body env e2) else (eval_func_body env e3)
 
   (* Loops *)
   | ForLoop (e1, e2, e3, e4) -> begin 
-      let env2 = new_environmet env in
+      let env2 = new_environment env in
       eval e1 env2;
-      while (check_bool (eval e2 env2)) do
+      while (bool_check (eval e2 env2)) do
         begin
-          eval_func_body env2 e4
+            eval_func_body env2 e4;
             eval e3 env2
         end
-      done
+      done;
+      Undefined
     end
 
   | WhileLoop (condition, seq) -> let env2 = new_environment env in 
-    while (check_bool (eval condition env2)) do
+    while (bool_check (eval condition env2)) do
       eval_func_body env2 seq
-    done
+    done; Undefined
 
-  | DoWhileLoop (condition, seq) -> let env2 = new_environmnet env in
+  | DoWhileLoop (condition, seq) -> let env2 = new_environment env in
     begin
       eval_func_body env2 seq;
-      while (check_bool (eval condition env2)) do
+      while (bool_check (eval condition env2)) do
         eval_func_body env2 seq
-      done
+      done;
+      Undefined
     end
 
 
