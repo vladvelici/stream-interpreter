@@ -1,3 +1,5 @@
+(** Definitions of the interpreter objects **)
+
 type expression =
   | DeclAssign of string * tipe * expression        (* int a = 3  *)
   | CtxDeclaration of string * expression           (* a := 3 *)
@@ -44,16 +46,18 @@ type expression =
   (* Do-While Loop operator: do { a = a + 2... } while ( i < 5 ) *)
   | DoWhileLoop of expression * (expression list)
 
-and tipe = Int | String | Float | Boolean | Function of tipe * (tipe list)
+and tipe = Int | String | Float | Boolean | Function of tipe * (tipe list) | Stream of tipe | Unit
 and argument = Argument of string * tipe
 
-and func = Func of tipe * (argument list) * (expression list)
+and func = Func of tipe * (argument list) * (expression list) | NativeFunc of tipe * string * (tipe list)
 
 and varValue =
   | ValInt of int
+  | ValString of string
   | ValFloat of float
   | ValBoolean of bool
   | ValFunction of func
+  | ValStream of varValue Stream.t
   | Null
   | Undefined
 
