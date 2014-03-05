@@ -86,8 +86,8 @@ numerical:
 
 /* If statement */
 if_statement:
-   | IF LPAREN expr RPAREN exprSeq		{ If ($3, $5) }
-   | IF LPAREN expr RPAREN exprSeq ELSE exprSeq	{ IfElse ($3, $5, $7) }
+   | IF LPAREN expr RPAREN LBRACE exprSeq RBRACE	{ If ($3, $6) }
+   | IF LPAREN expr RPAREN LBRACE exprSeq RBRACE ELSE LBRACE exprSeq RBRACE { IfElse ($3, $6, $10) }
 
 /* Loops */
 loop:

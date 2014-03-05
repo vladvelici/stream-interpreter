@@ -54,7 +54,7 @@ rule token = parse
     | "stream"  { STREAM }
 
     (* variable types *)
-    | "int" | "string" | "float" | "bool" as lxm { TYPE(type_of_string lxm) }
+    | "int"  | "float" | "bool" as lxm { TYPE(type_of_string lxm) }
     | ['0'-'9']+ as lxm { INT(int_of_string lxm) }
     | ['a'-'z''A'-'Z''_']['a'-'z''A'-'Z''_''0'-'9']* as lxm { VARNAME(lxm) }
 

@@ -63,29 +63,28 @@ let rec eval exp env = match exp with
       eval e1 env2;
       while (bool_check (eval e2 env2)) do
         begin
-            eval_func_body env2 e4;
+           (*  eval_func_body env2 e4; *)
             eval e3 env2
         end
-      done;
-      Undefined
-    end
+      done
+  end; Undefined
 
-  | WhileLoop (condition, seq) -> let env2 = new_environment env in 
-    while (bool_check (eval condition env2)) do
-      eval_func_body env2 seq
-    done; Undefined
+  | WhileLoop (condition, seq) ->
+          let env2 = new_environment env in
+        begin  
+        while (bool_check (eval condition env2)) do
+          eval_func_body env2 seq
+        done;
+         Undefined
+        end
 
   | DoWhileLoop (condition, seq) -> let env2 = new_environment env in
-    begin
       eval_func_body env2 seq;
       while (bool_check (eval condition env2)) do
         eval_func_body env2 seq
       done;
       Undefined
-    end
 
-
-  | tmp -> raise (NotYetImplemented tmp)
 
 and is_zero = function
   | ValInt n -> n = 0

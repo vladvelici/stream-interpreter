@@ -49,14 +49,13 @@ type expression =
   (* Do-While Loop operator: do { a = a + 2... } while ( i < 5 ) *)
   | DoWhileLoop of expression * (expression list)
 
-and tipe = Int | String | Float | Boolean | Function of tipe * (tipe list) | Stream of tipe | Unit
+and tipe = Int | Float | Boolean | Function of tipe * (tipe list) | Stream of tipe | Unit
 and argument = Argument of string * tipe
 
 and func = Func of tipe * (argument list) * (expression list) | NativeFunc of tipe * string * (tipe list)
 
 and varValue =
   | ValInt of int
-  | ValString of string
   | ValFloat of float
   | ValBoolean of bool
   | ValFunction of func
@@ -69,7 +68,6 @@ and variable = tipe * varValue;;
 let type_of_string = function
   | "bool" -> Boolean
   | "int" -> Int
-  | "string" -> String
   | "float" -> Float 
   | _ -> failwith "Invalid argument for type_of_string.";;
 

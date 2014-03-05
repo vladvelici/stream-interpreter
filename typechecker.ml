@@ -12,6 +12,34 @@ let rec typeOf exp env = match exp with
     | ApplyLambda (fnc, _) -> return_type (typeOf (Primitive (ValFunction fnc)) env) "-lambda-"
     | NewStream expr -> Stream (return_type (typeOf expr env) "-newstream-")
     | ReadStream expr -> return_type_stream expr env
+    
+    | PlusOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
+    | MinusOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
+    | MultiplyOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
+    | DivOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
+    | PlusOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
+
+    | ExponentOperator (_, _) -> Float
+    | ModOperator (_, _) -> Int
+
+    | Equal (_, _) -> Boolean
+    | NonEqual (_, _) -> Boolean
+    | Or (_, _) -> Boolean
+    | And (_, _) -> Boolean
+    | Less (_, _) -> Boolean
+    | Greater (_, _) -> Boolean
+    | LessEqual (_, _) -> Boolean
+    | GreaterEqual (_, _) -> Boolean
+    | Not _ -> Boolean
+
+    | NegationOperator e -> let t = typeOf e env in if is_type_number t then t else raise NotANumber
+
+    | If (_, _) -> Unit
+    | IfElse (_, _, _) -> Unit
+    | ForLoop (_, _, _, _) -> Unit
+    | WhileLoop (_, _) -> Unit
+    | DoWhileLoop (_, _) -> Unit
+
     | Primitive (ValInt _) -> Int
     | Primitive (ValFloat _) -> Float
     | Primitive (ValBoolean _) -> Boolean
@@ -19,7 +47,19 @@ let rec typeOf exp env = match exp with
     | Primitive (Undefined) -> Unit
     | Primitive (ValStream (t, _)) -> Stream t
     | Primitive (ValFunction (Func (t, arglist, _))) -> Function (t, (typelist_of_arglist arglist))
-    | _ -> raise (NotYetImplemented exp)
+    | Primitive (ValFunction (NativeFunc (t, _, typelist))) -> Function (t, (typelist))
+
+and is_type_number t = match t with
+    | Int -> true
+    | Float -> true
+    | _ -> false
+
+and type_of_numeric_op t1 t2 = match t1, t2 with
+    | Int, Int -> Int
+    | Float, Int -> Float
+    | Int, Float -> Float
+    | Float, Float -> Float
+    | _, _ -> raise NotANumber
 
 (* given an arugmnet list, return a list of their types only *)
 and typelist_of_arglist = function
