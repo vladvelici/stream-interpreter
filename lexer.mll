@@ -56,6 +56,7 @@ rule token = parse
     (* variable types *)
     | "int"  | "float" | "bool" as lxm { TYPE(type_of_string lxm) }
     | ['0'-'9']+ as lxm { INT(int_of_string lxm) }
+    | ['0'-'9']+'.'['0'-'9']+ as lxm { FLOAT(float_of_string lxm) }
     | ['a'-'z''A'-'Z''_']['a'-'z''A'-'Z''_''0'-'9']* as lxm { VARNAME(lxm) }
 
     | eof      { raise Eof }

@@ -144,9 +144,18 @@ and eval_func_body scope body : varValue= match body with
   | expr :: [] -> eval expr scope
   | expr :: exprList -> eval expr scope; eval_func_body scope exprList
 
+and params_to_values params env = match params with
+  | p :: l -> (eval p env) :: params_to_values l env
+  | [] -> []
+
+and check_parameter_types params typelist env = match params, typelist with
+  | p :: p_list, t :: t_list -> types_identical (typeOf p env) t && check_parameter_types p_list t_list env
+  | [], [] -> true
+  | _, _ -> false
+
 (* calls the given function in the given call_scope. Note that the function scope inherits the declaration scope, not the call scope. *)
 and apply_function call_scope decl_scope f params = match f with
-  | NativeFunc (_, name, arguments) -> run_native_code name params 
+  | NativeFunc (_, name, arguments) -> if check_parameter_types params arguments call_scope then run_native_code name (params_to_values params call_scope) else raise (IncompatibleTypes (Unit, Unit)) 
   | Func (rType, arguments, body) ->
     if (typecheck_parameters arguments params call_scope) then
       let func_scope = new_environment decl_scope

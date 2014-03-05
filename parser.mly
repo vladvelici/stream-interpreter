@@ -3,6 +3,7 @@
 %{ open InterpreterObjects %}
 
 %token <int> INT
+%token <float> FLOAT
 %token <string> VARNAME
 %token <InterpreterObjects.tipe> TYPE
 %token ASSIGN TYPE_ASSIGN
@@ -53,6 +54,7 @@ expr:
 /* primitives */
 primitive:
     | INT           { ValInt $1 }
+    | FLOAT         { ValFloat $1 }
     | TRUE          { ValBoolean true }
     | FALSE         { ValBoolean false }
     | lambda        { ValFunction ($1) }
