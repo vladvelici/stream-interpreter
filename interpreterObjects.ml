@@ -17,6 +17,9 @@ type expression =
   | ExponentOperator of expression * expression     (* a ^ b *)
   | ModOperator of expression * expression          (* a % b *)
   | NegationOperator of expression		    (* - a *)
+  
+  | NewStream of expression                         (* ~f or ~func(int x) int {...} *)
+  | ReadStream of expression                        (*  *)
 
   (* Equality testing operators *)
   | Equal of expression * expression		    (* a == b *)
@@ -57,7 +60,7 @@ and varValue =
   | ValFloat of float
   | ValBoolean of bool
   | ValFunction of func
-  | ValStream of varValue Stream.t
+  | ValStream of tipe * varValue Stream.t
   | Null
   | Undefined
 

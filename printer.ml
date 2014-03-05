@@ -12,7 +12,7 @@ let rec string_of_expression = function
             | ValFloat v -> string_of_float v
             | ValBoolean v -> string_of_bool v
             | ValFunction v -> string_of_func v
-            | ValStream s -> "stream"
+            | ValStream (t, _) -> "stream:" ^ (string_of_type t)
             | Null -> "Null"
             | Undefined -> "Undefined"
     )
@@ -29,7 +29,7 @@ and string_of_type = function
     | Boolean -> "<bool>"
     | String -> "<string>"
     | Unit -> "<Unit>"
-    | Stream _ -> "<Stream>"
+    | Stream t -> "<Stream:" ^ string_of_type t ^ ">"
     | Function (a, b) -> "<func (" ^ (string_of_TypeList b) ^ ") " ^ (string_of_type a) ^ ">"
 
 and string_of_TypeList = function

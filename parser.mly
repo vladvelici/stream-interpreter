@@ -9,12 +9,12 @@
 %token COMMA
 %token LBRACE RBRACE LPAREN RPAREN
 %token PLUS MINUS TIMES DIV EXPONENTIAL MODULO ABS 
-%token EQUAL LESS GREATER LESSEQUAL GREATEREQUAL
+%token EQUAL LESS GREATER LESSEQUAL GREATEREQUAL NONEQUAL NOT
 %token OR AND
 %token COLON TILDE LCHEVRONS
 %token TRUE FALSE
 %token IF ELSE
-%token FOR WHILE DOWHILE
+%token FOR WHILE DO WHILE
 %token FUNC
 %token STREAM
 %token EOL
@@ -82,7 +82,7 @@ numerical:
     /* Boolean logic */
     | NOT expr				{ Not ($2) }
     | expr OR expr			{ Or ($1, $3) }
-    | expr AND expr			{ And ($1, $3) }*/
+    | expr AND expr			{ And ($1, $3) }
 
 /* If statement */
 if_statement:
@@ -91,9 +91,9 @@ if_statement:
 
 /* Loops */
 loop:
-   | FOR LPAREN expr COMMA expr COMMA expr RPAREN LBRACE exprSeq RBRACE	{ ForLoop ($5, $7, $9, $12) }
+   | FOR LPAREN expr COMMA expr COMMA expr RPAREN LBRACE exprSeq RBRACE	{ ForLoop ($3, $5, $7, $10) }
    | WHILE LPAREN expr RPAREN LBRACE exprSeq RBRACE					{ WhileLoop ($3, $6) }
-   | DO LBRACE exprSeq RBRACE WHILE LPAREN expr RPAREN					{ DoWhileLoop ($3, $7) }
+   | DO LBRACE exprSeq RBRACE WHILE LPAREN expr RPAREN					{ DoWhileLoop ($7, $3) }
 
 /* Matches the following:
  * int a = 3
@@ -161,3 +161,5 @@ lambda:
 streams:
     | TILDE expr                        { NewStream $2 }
     | LCHEVRONS expr                    { ReadStream $2 }
+;
+

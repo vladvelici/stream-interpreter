@@ -11,7 +11,7 @@ type environment =
 
 let new_environment parent = Environment (parent, (Hashtbl.create 10));;
 
-(* lookup_variable_all returns the variable /tipe * varVal/ and the environment where it's defined *)
+(* lookup_variable_all reutrns the variable /tipe * varVal/ and the environment where it's defined *)
 let rec lookup_variable_all env varname = 
     match env with
     | RootEnv ht -> (env, Hashtbl.find ht varname)

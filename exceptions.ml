@@ -1,4 +1,5 @@
 (** Common exceptions **)
+open InterpreterObjects
 
 exception CannotRedefineVariable of string;;
 exception UndefinedVariable of string;;
@@ -8,3 +9,4 @@ exception NotAFunction of string;;
 exception DivisionByZero;;
 exception NotYetImplemented of expression;;
 exception NotAStream;;
+exception NotANumber;;

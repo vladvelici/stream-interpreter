@@ -28,9 +28,7 @@ rule token = parse
     | '*'       { TIMES }
     | '/'       { DIV }
     | '^'       { EXPONENTIAL }
-    | "sqrt"	{ SQRT }
     | '%'       { MODULO }
-    | "abs"	{ ABS }
     | "=="	{ EQUAL }
     | '<'	{ LESS }
     | '>'	{ GREATER }
@@ -51,7 +49,7 @@ rule token = parse
     | "else"	{ ELSE }
     | "for"	{ FOR }
     | "while"	{ WHILE }
-    | "do-while"	{ DOWHILE }
+    | "do"	{ DO }
     | "func"    { FUNC }
     | "stream"  { STREAM }
 
