@@ -11,20 +11,23 @@ Hashtbl.replace roottbl "input_length" (Function (Int, []), (ValFunction (Native
 Hashtbl.replace roottbl "input" (Function (Stream Int, [Int]), (ValFunction (NativeFunc (Stream Int, "input", [Int]))));;
 Hashtbl.replace roottbl "output" (Function (Unit, [Stream Int]), (ValFunction (NativeFunc (Unit, "output", [Stream Int]))));;
 
+let in_file = open_in Sys.argv.(1)
+
 let root = RootEnv roottbl;;
     let _ = 
         try (
-            let lexbuf = Lexing.from_channel stdin 
+            let lexbuf = Lexing.from_channel in_file
             in while true do
                 try
                     let result = Parser.main Lexer.token lexbuf 
-                    in
-                    print_string (tmpPrint (eval result root));
-                    print_string "\n";
-                    flush stdout; 
+                    in match result with
+                    | Expression e ->
+                        eval e root;
+                        flush stdout;
+                    | Empty -> ()
                with Parsing.Parse_error -> print_string "Parsing error. Sorry. \n"; flush stdout
             done
         ) with
-        | Lexer.Eof -> print_string "Bye :-h\n" ; flush stdout ; exit 0;
+        | Lexer.Eof ->  flush stdout ; exit 0;
 
 

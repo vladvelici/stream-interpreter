@@ -1,6 +1,9 @@
 (** Definitions of the interpreter objects **)
 
-type expression =
+type output = Empty | Expression of expression
+
+and expression =
+    (* Makes the interpreter move to the next line *)
   | DeclAssign of string * tipe * expression        (* int a = 3  *)
   | CtxDeclaration of string * expression           (* a := 3 *)
   | Assignment of string * expression               (* a = 4 *)

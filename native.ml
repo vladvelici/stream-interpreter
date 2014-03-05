@@ -1,12 +1,10 @@
 open InterpreterObjects
 open Scanf
 
-let file = "p2.txt";; 
-
 let no_of_inputs = ref 0
 and input_length = ref 0;;
 
-let input_channel = Scanning.open_in file;;
+let input_channel = Scanning.stdin;;
 let f n m = no_of_inputs := n; input_length := m in bscanf input_channel "%d %d " f;;
 
 let inputs = Array.make_matrix !no_of_inputs !input_length 0;;

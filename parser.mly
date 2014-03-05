@@ -19,6 +19,7 @@
 %token FUNC
 %token STREAM
 %token EOL
+%token NULL
 
 %left PLUS MINUS        /* lowest precedence */
 %left MODULO
@@ -31,10 +32,11 @@
 
 %start main             /* the entry point */
 
-%type <InterpreterObjects.expression> main
+%type <InterpreterObjects.output> main
 %%
 main:
-    | expr EOL          { $1 }
+    | EOL               { Empty }
+    | expr EOL          { Expression $1 }
 ;
 
 /* Expression */
@@ -49,6 +51,7 @@ expr:
     | lambda LPAREN vallist RPAREN      { ApplyLambda ($1, $3) }
     | VARNAME                           { VarName $1 } 
     | streams                           { $1 }
+    | LPAREN expr RPAREN                { $2 }
 ;
 
 /* primitives */
@@ -58,6 +61,7 @@ primitive:
     | TRUE          { ValBoolean true }
     | FALSE         { ValBoolean false }
     | lambda        { ValFunction ($1) }
+    | NULL          { Null }
 ;
 
 /* Numerical operations */

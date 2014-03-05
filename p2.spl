@@ -1,0 +1,19 @@
+s1 := input(0)
+s2 := input(1)
+
+f := func (int count) int {
+    r := 0
+    if (count > 3) {
+        r = null 
+    } else {
+        r = count
+    }
+    r
+}
+
+s3 := ~f
+<<s3
+<<s3
+
+output(~f)
+
