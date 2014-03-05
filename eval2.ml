@@ -26,6 +26,7 @@ let rec typeOf exp env = match exp with
     | Primitive (ValBoolean _) -> Boolean
     | Primitive (Null) -> Unit
     | Primitive (Undefined) -> Unit
+    | Primitive (ValStream (t, _)) -> Stream t
     | Primitive (ValFunction (Func (t, arglist, _))) -> Function (t, (typelist_of_arglist arglist))
     | _ -> raise (NotYetImplemented exp)
 
@@ -41,16 +42,14 @@ and returnType fnc name = match fnc with
     | Function (t, _) -> t
     | _ -> raise (NotAFunction name)
 
-and returnTypeStream expr env = match expr with
-    | NewStream _ -> let stream = typeOf expr env in (match stream with Stream t -> t | _ -> raise NotAStream)
-    | VarName name -> let stream = typeOf expr env in (match stream with Stream t -> t | _ -> raise NotAStream)
-    | _ -> raise NotAStream
+and returnTypeStream expr env = 
+    let stream = typeOf expr env in (match stream with Stream t -> t | _ -> raise NotAStream)
 
 (* helpers for working with functions *)
 and value_of_var = function (_, v) -> v
 and type_of_var = function (t, _) -> t
 
-(* whether the Primitive is a function or not *)
+(* whether the type of Primitive is a function or not *)
 and is_function = function
     | Function _ -> true
     | _ -> false
@@ -85,21 +84,19 @@ let rec eval exp env = match exp with
     | ApplyLambda (f, params) -> apply_function env env f params
     | ApplyFunction (name, params) -> let (decl_scope, (varType, f)) = lookup_variable_all env name
         in if (is_function varType) then apply_function env decl_scope (func_of_varval f) params else raise (NotAFunction name) 
-    | NewStream expr -> create_new_stream expr env
+    | NewStream expr -> if is_function (typeOf expr env) then let f = func_of_varval (eval expr env) in create_new_stream f env else raise (NotAFunction "--")
     | ReadStream expr -> if is_stream expr env then (let stream = eval expr env in read_stream stream) else raise (NotAStream)
     | Primitive p -> p
     | tmp -> raise (NotYetImplemented tmp)
 
+(*todo: typecheck this*)
 and read_stream stream = match stream with
-    | ValStream s -> (try (Stream.next s) with Stream.Failure -> Null)
+    | ValStream (t, s) -> (try (Stream.next s) with Stream.Failure -> Null)
+    | _ -> raise NotAStream
 
-(* create new stream *)
-and create_new_stream expr env =
-    let stream_const = (
-        match expr with
-        | Primitive (ValFunction f) -> internal_new_stream env f
-        | VarName name -> let (scope, (_, (ValFunction f))) = lookup_variable_all env name in internal_new_stream scope f
-    ) in ValStream (Stream.from stream_const) 
+(* create new stream (returns ValStream) *)
+and create_new_stream f env = let stream_type = match f with Func (t, _, _) -> t | NativeFunc (t, _, _) -> t
+    in ValStream (stream_type, Stream.from (internal_new_stream env f))
 
 (* helper function to return the function from a varValue *)
 and func_of_varval = function

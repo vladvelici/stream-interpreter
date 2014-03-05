@@ -30,7 +30,7 @@ and varValue =
   | ValFloat of float
   | ValBoolean of bool
   | ValFunction of func
-  | ValStream of varValue Stream.t
+  | ValStream of tipe * varValue Stream.t
   | Null
   | Undefined
 
