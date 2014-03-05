@@ -145,15 +145,18 @@ and eval_func_body scope body : varValue= match body with
 (* calls the given function in the given call_scope. Note that the function scope inherits the declaration scope, not the call scope. *)
 and apply_function call_scope decl_scope f params = match f with
     | NativeFunc (_, name, arguments) -> run_native_code name params 
-    | Func (retrunType, arguments, body) ->
+    | Func (rType, arguments, body) ->
         if (validate_parameters arguments params call_scope) then
             let func_scope = new_environment decl_scope
-            in apply_param_bindings func_scope call_scope params arguments; eval_func_body func_scope body
+            in apply_param_bindings func_scope call_scope params arguments;
+            let res = eval_func_body func_scope body
+            in let resType = typeOf (Primitive res) func_scope
+            in if (types_compatible rType resType) then res else raise (IncompatibleTypes (rType, resType))
         else raise (IncompatibleTypes (Unit, Unit))
 
 and internal_new_stream decl_scope f count =
     let return = eval (ApplyLambda (f, [Primitive (ValInt count)])) decl_scope  
-    in if return = Undefined then None else Some return
+    in if return = Undefined || return = Null then None else Some return
 ;;
 
 
