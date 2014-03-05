@@ -6,16 +6,26 @@
 %token <string> VARNAME
 %token <InterpreterObjects.tipe> TYPE
 %token ASSIGN TYPE_ASSIGN
-%token LPAREN RPAREN LBRACE RBRACE
-%token PLUS MINUS MODULO DIV TIMES EXPONENTIAL
 %token COMMA
+%token LBRACE RBRACE LPAREN RPAREN
+%token PLUS MINUS TIMES DIV EXPONENTIAL MODULO ABS 
+%token EQUAL LESS GREATER LESSEQUAL GREATEREQUAL
+%token OR AND
+%token TRUE FALSE
+%token IF ELSE
+%token FOR WHILE DOWHILE
 %token FUNC
+
 %left PLUS MINUS        /* lowest precedence */
 %left MODULO
 %left TIMES DIV       /* medium precedence */
 %left EXPONENTIAL
+%nonassoc UMINUS
+
 %token EOL
+
 %start main             /* the entry point */
+
 %type <InterpreterObjects.expression> main
 %%
 main:
@@ -30,6 +40,43 @@ expr:
     | lambda LPAREN vallist RPAREN      { ApplyLambda ($1, $3) }
     | VARNAME                           { VarName $1 } 
 ;
+
+/* Numerical operations */
+numerical:
+    /* Arithmetics */
+    | expr PLUS expr			{ PlusOperator ($1, $3) }
+    | expr MINUS expr			{ MinusOperator ($1, $3) }
+    | expr TIMES expr			{ MultiplyOperator ($1, $3) }
+    | expr DIV expr			{ DivOperator ($1, $3) }
+    | expr EXPONENTIAL expr		{ ExponentOperator ($1, $3) }
+    | expr MODULO expr			{ ModOperator ($1, $3) }
+    | MINUS expr %prec UMINUS		{ NegationOperator ($2) }
+
+    /* Equality testing */
+    | expr EQUAL expr			{ Equal ($1, $3) }
+    | expr NONEQUAL expr		{ NonEqual ($1, $3) }
+
+    /* Order relations */
+    | expr LESS expr			{ Less ($1, $3) }
+    | expr GREATER expr			{ Greater ($1, $3) }
+    | expr LESSEQUAL expr		{ LessEqual ($1, $3) }
+    | expr GREATEREQUAL expr		{ GreaterEqual ($1, $3) }
+
+    /* Boolean logic */
+    | NOT expr				{ Not ($2) }
+    | expr OR expr			{ Or ($1, $3) }
+    | expr AND expr			{ And ($1, $3) }*/
+
+/* If statement */
+if_statement:
+   | IF LPAREN expr RPAREN exprSeq		{ If ($3, $5) }
+   | IF LPAREN expr RPAREN exprSeq ELSE exprSeq	{ IfElse ($3, $5, $7) }
+
+/* Loops */
+loop:
+   | FOR LPAREN VARNAME ASSIGN expr COMMA expr COMMA expr RPAREN LBRACE exprSeq RBRACE	{ ForLoop ($5, $7, $9, $12) }
+   | WHILE LPAREN expr RPAREN LBRACE exprSeq RBRACE					{ WhileLoop ($3, $6) }
+   | DO LBRACE exprSeq RBRACE WHILE LPAREN expr RPAREN					{ DoWhileLoop ($3, $7) }
 
 /* Matches the following:
  * int a = 3
