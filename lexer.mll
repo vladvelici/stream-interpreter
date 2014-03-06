@@ -1,4 +1,4 @@
-(* File lexer.mll *)
+(** File lexer.mll **)
 {
 open InterpreterObjects
 open Parser
@@ -8,9 +8,6 @@ exception Eof
 rule token = parse
       [' ' '\t']     { token lexbuf }     (* skip blanks *)
     | ['\n' ]  { EOL }
-
-    (* primitive type matches, no func and stream *)
-    | ['0'-'9']+ as lxm { INT(int_of_string lxm) }
 
     (* assignment syntax *)
     | "="       { ASSIGN }
@@ -31,9 +28,7 @@ rule token = parse
     | '*'       { TIMES }
     | '/'       { DIV }
     | '^'       { EXPONENTIAL }
-    | "sqrt"	{ SQRT }
     | '%'       { MODULO }
-    | "abs"	{ ABS }
     | "=="	{ EQUAL }
     | '<'	{ LESS }
     | '>'	{ GREATER }
@@ -42,9 +37,10 @@ rule token = parse
     | "||"	{ OR }
     | "&&"	{ AND }
 
-    (* variable types *)
-    | "int" | "string" | "float" | "bool" as lxm { TYPE(type_of_string lxm) }
-    | ['a'-'z''A'-'Z''_']['a'-'z''A'-'Z''_''0'-'9']* as lxm { VARNAME(lxm) }
+    (* stream manipulation syntax *)
+    | ":"       { COLON }
+    | "<<"      { LCHEVRONS }
+    | "~"       { TILDE }
 
     (* keywords *)
     | "true"	{ TRUE }
@@ -53,7 +49,16 @@ rule token = parse
     | "else"	{ ELSE }
     | "for"	{ FOR }
     | "while"	{ WHILE }
-    | "do-while"	{ DOWHILE }
+    | "do"	{ DO }
     | "func"    { FUNC }
+    | "stream"  { STREAM }
+    | "null"    { NULL }
+    | "undefined" { UNDEFINED }
+
+    (* variable types *)
+    | "int"  | "float" | "bool" as lxm { TYPE(type_of_string lxm) }
+    | ['0'-'9']+ as lxm { INT(int_of_string lxm) }
+    | ['0'-'9']+'.'['0'-'9']+ as lxm { FLOAT(float_of_string lxm) }
+    | ['a'-'z''A'-'Z''_']['a'-'z''A'-'Z''_''0'-'9']* as lxm { VARNAME(lxm) }
 
     | eof      { raise Eof }
