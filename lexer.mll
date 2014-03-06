@@ -53,6 +53,7 @@ rule token = parse
     | "func"    { FUNC }
     | "stream"  { STREAM }
     | "null"    { NULL }
+    | "undefined" { UNDEFINED }
 
     (* variable types *)
     | "int"  | "float" | "bool" as lxm { TYPE(type_of_string lxm) }

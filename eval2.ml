@@ -29,7 +29,7 @@ let rec eval exp env = match exp with
   | DivOperator (e1, e2) -> let n = (eval e2 env) in
     if (is_zero n) = false then (div (eval e1 env) n) else raise DivisionByZero
   | ExponentOperator (e1, e2) -> exponent (eval e1 env) (eval e2 env)
-  | ModOperator (e1, e2) -> let ValInt v1 = (eval e1 env) and ValInt v2 = (eval e2 env) in ValInt (v1 mod v2)
+  | ModOperator (e1, e2) -> modulo (eval e1 env) (eval e2 env)
   | NegationOperator e -> (match (eval e env) with ValFloat v -> ValFloat (-.v) | ValInt v -> ValInt (-v) | _ -> raise NotANumber)
 
   (* Equality testing *)
@@ -127,7 +127,6 @@ and fetch_variable env name =
   try (
     let var = lookup_variable env name
     in match var with
-    | (_, Undefined) -> raise (UninitializedVariable name)
     | (_, v) -> v
   ) with Not_found -> raise (UndefinedVariable name)
 

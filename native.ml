@@ -1,7 +1,7 @@
 open InterpreterObjects
 open Scanf
 
-let file = "p2.txt";; 
+let file = "p1.txt";; 
 
 let no_of_inputs = ref 0
 and input_length = ref 0;;

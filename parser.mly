@@ -19,11 +19,11 @@
 %token FUNC
 %token STREAM
 %token EOL
-%token NULL
+%token NULL UNDEFINED
 
+%left EQUAL LESS GREATER NONEQUAL LESSEQUAL GREATEREQUAL
 %left PLUS MINUS        /* lowest precedence */
-%left MODULO
-%left TIMES DIV       /* medium precedence */
+%left TIMES DIV MODULO       /* medium precedence */
 %left EXPONENTIAL
 
 %nonassoc UMINUS
@@ -62,6 +62,7 @@ primitive:
     | FALSE         { ValBoolean false }
     | lambda        { ValFunction ($1) }
     | NULL          { Null }
+    | UNDEFINED     { Undefined }
 ;
 
 /* Numerical operations */

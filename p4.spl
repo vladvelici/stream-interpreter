@@ -1,0 +1,14 @@
+s1 := input(0)
+s2 := input(1)
+
+func f (int c) int {
+    int r
+    if (c%2 == 0) {
+        r = <<s1
+    } else {
+        r = <<s2
+    }
+    r
+}
+
+output(~f)

@@ -1,0 +1,8 @@
+s := input(0)
+
+func f (int c) int {
+    r := <<s
+    <<s
+    r
+}
+output(~f)
