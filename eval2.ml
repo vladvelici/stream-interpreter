@@ -117,7 +117,7 @@ and do_assign env name expr =
   try (
     let (varEnv, (tvar, _)) = lookup_variable_all env name
     and tval = typeOf expr env
-    in if types_compatible tval tvar then put_variable varEnv name (tvar, (eval expr env)) else (raise (IncompatibleTypes (tvar, tval))); Undefined
+    in if types_compatible tvar tval then put_variable varEnv name (tvar, (eval expr env)) else (raise (IncompatibleTypes (tvar, tval))); Undefined
   ) with Not_found -> (raise (UndefinedVariable name))
 
 (* fetch a variable by name from the given environment (or any parent environments)

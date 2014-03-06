@@ -2,13 +2,9 @@ s1 := input(0)
 s2 := input(1)
 
 f := func (int count) int {
-    r := 0
-    if (count > 3) {
-        r = null 
-    } else {
-        r = count
-    }
-    r
+    int a = <<s1
+    int b = <<s2
+    a+b
 }
 
 s3 := ~f

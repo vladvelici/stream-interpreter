@@ -16,13 +16,16 @@ let in_file = open_in Sys.argv.(1)
 let root = RootEnv roottbl;;
     let _ = 
         try (
-            let lexbuf = Lexing.from_channel in_file
+            let lexbuf = Lexing.from_channel stdin
             in while true do
                 try
                     let result = Parser.main Lexer.token lexbuf 
                     in match result with
                     | Expression e ->
-                        eval e root;
+                        print_string (tmpPrint (eval e root));
+                        print_string "\n";
+                        flush stdout; 
+ 
                         flush stdout;
                     | Empty -> ()
                with Parsing.Parse_error -> print_string "Parsing error. Sorry. \n"; flush stdout
