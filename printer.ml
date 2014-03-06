@@ -5,8 +5,9 @@ let rec string_of_expression = function
   | CtxDeclaration (name, exp) -> name ^ ":=" ^ "["^(string_of_expression exp)^"]"
   | Assignment (name, exp) -> name ^ " = "^(string_of_expression exp)^""
   | VarName name -> name
-  | Primitive p -> (
-      match p with
+  | Primitive p -> string_of_primitive p
+
+and string_of_primitive p =  match p with
       | ValInt v -> string_of_int v
       | ValFloat v -> string_of_float v
       | ValBoolean v -> string_of_bool v
@@ -14,7 +15,6 @@ let rec string_of_expression = function
       | ValStream (t, _) -> "stream:" ^ (string_of_type t)
       | Null -> "Null"
       | Undefined -> "Undefined"
-    )
 
 and string_of_func = function
   | Func (tipe, arg, exprList) -> "func (" ^ (string_of_ArgList arg) ^ ") " ^ (string_of_type tipe) ^

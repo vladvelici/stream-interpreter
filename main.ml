@@ -12,6 +12,10 @@ Hashtbl.replace roottbl "input" (Function (Stream Int, [Int]), (ValFunction (Nat
 Hashtbl.replace roottbl "output" (Function (Unit, [Stream Int]), (ValFunction (NativeFunc (Unit, "output", [Stream Int]))));;
 Hashtbl.replace roottbl "reverse" (Function (Stream Int, [Stream Int]), (ValFunction (NativeFunc (Stream Int, "reverse", [Stream Int]))));;
 
+Hashtbl.replace roottbl "input_float" (Function (Stream Float, [Int]), (ValFunction (NativeFunc (Stream Float, "input", [Int]))));;
+Hashtbl.replace roottbl "output_float" (Function (Unit, [Stream Float]), (ValFunction (NativeFunc (Unit, "output", [Stream Float]))));;
+Hashtbl.replace roottbl "reverse_float" (Function (Stream Float, [Stream Float]), (ValFunction (NativeFunc (Stream Float, "reverse", [Stream Float]))));;
+
 let in_file = open_in Sys.argv.(1)
 
 let root = RootEnv roottbl;;
