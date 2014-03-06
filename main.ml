@@ -10,6 +10,7 @@ let roottbl:((string, variable) Hashtbl.t)  = Hashtbl.create 10;;
 Hashtbl.replace roottbl "input_length" (Function (Int, []), (ValFunction (NativeFunc (Int, "input_length", []))));;
 Hashtbl.replace roottbl "input" (Function (Stream Int, [Int]), (ValFunction (NativeFunc (Stream Int, "input", [Int]))));;
 Hashtbl.replace roottbl "output" (Function (Unit, [Stream Int]), (ValFunction (NativeFunc (Unit, "output", [Stream Int]))));;
+Hashtbl.replace roottbl "reverse" (Function (Stream Int, [Stream Int]), (ValFunction (NativeFunc (Stream Int, "reverse", [Stream Int]))));;
 
 let in_file = open_in Sys.argv.(1)
 

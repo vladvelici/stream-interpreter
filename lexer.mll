@@ -30,12 +30,14 @@ rule token = parse
     | '^'       { EXPONENTIAL }
     | '%'       { MODULO }
     | "=="	{ EQUAL }
+    | "!="  { NONEQUAL }
     | '<'	{ LESS }
     | '>'	{ GREATER }
     | "<="	{ LESSEQUAL }
     | ">="	{ GREATEREQUAL }
     | "||"	{ OR }
     | "&&"	{ AND }
+    | '!'   { NOT }
 
     (* stream manipulation syntax *)
     | ":"       { COLON }

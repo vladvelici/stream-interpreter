@@ -26,6 +26,7 @@
 %left TIMES DIV MODULO       /* medium precedence */
 %left EXPONENTIAL
 
+%nonassoc NOT
 %nonassoc UMINUS
 %nonassoc LCHEVRONS
 %nonassoc TILDE

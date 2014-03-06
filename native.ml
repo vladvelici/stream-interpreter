@@ -25,17 +25,26 @@ let output_format_stream s = let count = ref 0 and l = ref [] in (
     (!count, List.rev !l)
 );;
 
+let stream_to_lst s = let count = ref 0 and l = ref [] in (
+    let f e = count:=!count+1; l:=e :: !l in Stream.iter f s;
+    (!count, List.rev !l)
+);;
+
 let rec print_list = function 
     [] -> ()
     | e::l -> print_int e ; print_string " " ; print_list l;;
 
 let print_stream (count, lst) = print_int count; print_string "\n"; print_list lst; print_string "\n";;  
 
+let reverse_stream stream = let process_stream s = (let l = ref [] in ( let f e = l:=e :: !l in Stream.iter f s; !l ))
+    in Stream.of_list (process_stream stream);;
+
 let run_native_code name params = match name with 
     | "no_of_inputs" -> ValInt !no_of_inputs
     | "input_length" -> ValInt !input_length
     | "input" -> (match params with [ValInt nr] -> ValStream (Int, Stream.from (stream_from_array inputs.(nr))))
     | "output" -> (match params with [ValStream (t, s)] -> print_stream (output_format_stream s); Undefined)
+    | "reverse" -> (match params with [ValStream (t, s)] -> ValStream (t, (reverse_stream s)))
     | _ -> Null;;
 
 
