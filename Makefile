@@ -13,14 +13,14 @@
 
 # These are the object files needed to rebuild the main executable file
 #
-OBJS = interpreterObjects.cmo parser.cmo lexer.cmo printer.cmo environment.cmo exceptions.ml typechecker.ml evalHelperFunctions.ml native.cmo eval2.cmo main.cmo
+OBJS = args.cmo interpreterObjects.cmo parser.cmo lexer.cmo printer.cmo environment.cmo exceptions.ml typechecker.ml evalHelperFunctions.ml native.cmo eval2.cmo main.cmo
 
 # Files that need to be generated from other files
 DEPEND += lexer.ml parser.ml interpreterObjects.mli 
 
 # When "make" is invoked with no arguments, we build an executable 
 # typechecker, after building everything that it depends on
-all: .depend $(DEPEND) $(OBJS) runinterp
+all: .depend $(DEPEND) $(OBJS) mysplinterpreter
 
 # Include an automatically generated list of dependencies between source files
 # (if something doesn't compile, run make depend)
@@ -30,7 +30,7 @@ interpreterObjects.mli:
 	ocamlc -i interpreterObjects.ml > interpreterObjects.mli
 
 # Build an executable typechecker
-runinterp: $(OBJS) main.cmo 
+mysplinterpreter: $(OBJS) main.cmo 
 	@echo Linking $@
 	ocamlc -o $@ $(COMMONOBJS) $(OBJS) 
 
@@ -57,7 +57,7 @@ parser.ml parser.mli: parser.mly
 # Clean up the directory
 clean::
 	rm -rf interpreterObjects.mli lexer.ml parser.ml parser.mli *.o *.cmo *.cmi parser.output \
-	   runinterp TAGS *~ .depend
+	   mysplinterpreter TAGS *~ .depend
 
 # Rebuild intermodule dependencies
 .depend:: $(DEPEND) 
