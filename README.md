@@ -84,11 +84,10 @@ conditionals, loops
 
 if (else/elseif), switch, for, while
 
+stream
+------
 
-
-new stream(func (arguments) int  {} )
-
-new stream( int (arguments) int {} )
+`~f` where `f` is a function
 
 scoping
 -------
