@@ -8,10 +8,8 @@ open EvalHelperFunctions
 (* EVALUATION *)
 let rec eval exp env = match exp with
   | DeclAssign (name, t, expr) -> let expr_type = typeOf expr env in 
-    if types_compatible t expr_type then
-      do_declare_assig env name t expr
-    else 
-      raise (IncompatibleTypes (t, expr_type))
+    types_compatible t expr_type;
+    do_declare_assig env name t expr
   | CtxDeclaration (name, expr) -> do_declare_assig env name (typeOf expr env) expr
   | Assignment (name, expr) -> do_assign env name expr
   | VarName name -> fetch_variable env name
@@ -43,48 +41,60 @@ let rec eval exp env = match exp with
   | GreaterEqual (e1, e2) -> greaterEqual (eval e1 env) (eval e2 env)
 
   (* Boolean logic operators *)
-  | Not e -> let valb = (eval e env) in (match valb with ValBoolean b -> ValBoolean (not b) | _ -> raise (IncompatibleTypes (Boolean, (typeOf (Primitive valb) env))))
-  | Or (e1, e2) -> if (typeOf e1 env) = Boolean && (typeOf e2 env) = Boolean then
-      let (ValBoolean val1) = (eval e1 env) and (ValBoolean val2) = (eval e2 env) in (ValBoolean (val1 || val2))
-  else
-      raise (IncompatibleTypes (Boolean, Unit))
-    | And (e1, e2) -> if (typeOf e1 env) = Boolean && (typeOf e2 env) = Boolean then
-        let (ValBoolean val1) = (eval e1 env) and (ValBoolean val2) = (eval e2 env) in (ValBoolean (val1 && val2))
-    else
-        raise (IncompatibleTypes (Boolean, Unit))
+  | Not e -> types_identical Boolean (typeOf e env); let valb = (eval e env) in 
+    (match valb with
+     | ValBoolean b -> ValBoolean (not b) 
+     | _ -> raise (IncompatibleTypes (Boolean, (typeOf (Primitive valb) env))))
+
+  | Or (e1, e2) -> types_identical Boolean (typeOf e1 env); types_identical Boolean (typeOf e2 env);       
+    let val1 = (eval e1 env) and val2 = (eval e2 env) in 
+    (match val1, val2 with
+     | ValBoolean b1, ValBoolean b2 -> ValBoolean (b1 || b2)
+     | _, _ -> raise (IncompatibleTypes (Unit, Unit)))
+
+  | And (e1, e2) -> types_identical Boolean (typeOf e1 env); types_identical Boolean (typeOf e2 env);       
+    let val1 = (eval e1 env) and val2 = (eval e2 env) in 
+    (match val1, val2 with 
+     | ValBoolean b1, ValBoolean b2 -> ValBoolean (b1 && b2)
+     | _, _ -> raise (IncompatibleTypes (Unit, Unit)))
 
   (* If statement operators *)
-  | If (e1, e2) -> if bool_check (eval e1 env) then (eval_func_body env e2)  else Undefined
-  | IfElse (e1, e2, e3) -> if bool_check (eval e1 env) then (eval_func_body env e2) else (eval_func_body env e3)
+  | If (e1, e2) -> if bool_check (eval e1 env) then (eval_func_body e2 env)  else Undefined
+  | IfElse (e1, e2, e3) -> if bool_check (eval e1 env) then (eval_func_body e2 env) else (eval_func_body e3 env)
 
   (* Loops *)
-  | ForLoop (e1, e2, e3, e4) -> begin 
+  | ForLoop (init, cond, afterthought, body) -> begin 
       let env2 = new_environment env in
-      eval e1 env2;
-      while (bool_check (eval e2 env2)) do
+      types_identical Boolean (typeOf cond env2);
+      eval_and_unit init env2;
+      while (bool_check (eval cond env2)) do
         begin
-           (*  eval_func_body env2 e4; *)
-            eval e3 env2
+          eval_func_body_and_unit body env2;
+          eval_and_unit afterthought env2
         end
       done
-  end; Undefined
+    end; Undefined
 
   | WhileLoop (condition, seq) ->
-          let env2 = new_environment env in
-        begin  
-        while (bool_check (eval condition env2)) do
-          eval_func_body env2 seq
-        done;
-         Undefined
-        end
-
-  | DoWhileLoop (condition, seq) -> let env2 = new_environment env in
-      eval_func_body env2 seq;
+    let env2 = new_environment env in
+    types_identical Boolean (typeOf condition env2);
+    begin  
       while (bool_check (eval condition env2)) do
-        eval_func_body env2 seq
+        eval_func_body_and_unit seq env2
       done;
       Undefined
+    end
 
+  | DoWhileLoop (condition, seq) -> let env2 = new_environment env in
+    types_identical Boolean (typeOf condition env2);  
+    eval_func_body_and_unit seq env2;
+    while (bool_check (eval condition env2)) do
+      eval_func_body_and_unit seq env2;
+    done;
+    Undefined
+
+and eval_and_unit expr env = let _ = eval expr env in ()
+and eval_func_body_and_unit exprList env = let _ = eval_func_body exprList env in ()
 
 and is_zero = function
   | ValInt n -> n = 0
@@ -117,7 +127,7 @@ and do_assign env name expr =
   try (
     let (varEnv, (tvar, _)) = lookup_variable_all env name
     and tval = typeOf expr env
-    in if types_compatible tvar tval then put_variable varEnv name (tvar, (eval expr env)) else (raise (IncompatibleTypes (tvar, tval))); Undefined
+    in types_compatible tvar tval; put_variable varEnv name (tvar, (eval expr env)); Undefined
   ) with Not_found -> (raise (UndefinedVariable name))
 
 (* fetch a variable by name from the given environment (or any parent environments)
@@ -138,31 +148,28 @@ and apply_param_bindings func_scope call_scope params arguments = match params, 
   | _, _ -> raise (IncompatibleTypes (Unit, Unit)) 
 
 (* Evalues a list of expressions and returns the value of the last one. Undefined if empty *)
-and eval_func_body scope body : varValue= match body with
+and eval_func_body body scope : varValue= match body with
   | [] -> Undefined
   | expr :: [] -> eval expr scope
-  | expr :: exprList -> eval expr scope; eval_func_body scope exprList
+  | expr :: exprList -> eval_and_unit expr scope; eval_func_body exprList scope
 
 and params_to_values params env = match params with
   | p :: l -> (eval p env) :: params_to_values l env
   | [] -> []
 
-and check_parameter_types params typelist env = match params, typelist with
-  | p :: p_list, t :: t_list -> types_identical (typeOf p env) t && check_parameter_types p_list t_list env
-  | [], [] -> true
-  | _, _ -> false
-
 (* calls the given function in the given call_scope. Note that the function scope inherits the declaration scope, not the call scope. *)
 and apply_function call_scope decl_scope f params = match f with
-  | NativeFunc (_, name, arguments) -> if check_parameter_types params arguments call_scope then run_native_code name (params_to_values params call_scope) else raise (IncompatibleTypes (Unit, Unit)) 
+  | NativeFunc (_, name, arguments) ->
+    check_parameter_types params arguments call_scope;
+    run_native_code name (params_to_values params call_scope)
+
   | Func (rType, arguments, body) ->
-    if (typecheck_parameters arguments params call_scope) then
-      let func_scope = new_environment decl_scope
-      in apply_param_bindings func_scope call_scope params arguments;
-      let res = eval_func_body func_scope body
-      in let resType = typeOf (Primitive res) func_scope
-      in if (types_compatible rType resType) then res else raise (IncompatibleTypes (rType, resType))
-    else raise (IncompatibleTypes (Unit, Unit))
+    check_parameter_types params (typelist_of_arglist arguments) call_scope;
+    let func_scope = new_environment decl_scope
+    in apply_param_bindings func_scope call_scope params arguments;
+    let res = eval_func_body body func_scope
+    in let resType = typeOf (Primitive res) func_scope
+    in types_compatible rType resType; res
 
 and internal_new_stream decl_scope f count =
   let return = eval (ApplyLambda (f, [Primitive (ValInt count)])) decl_scope  

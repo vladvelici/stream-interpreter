@@ -17,7 +17,6 @@ let rec typeOf exp env = match exp with
     | MinusOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
     | MultiplyOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
     | DivOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
-    | PlusOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
 
     | ExponentOperator (_, _) -> Float
     | ModOperator (_, _) -> Int
@@ -85,15 +84,17 @@ and type_is_function = function
     | Function _ -> true
     | _ -> false
 
-(* make sure arguments types match with function arguments *)
-let rec typecheck_parameters args params env = match args, params with
-    | [], [] -> true
-    | Argument(_, t_arg) :: arglist, expr :: paramlist -> (types_compatible t_arg (typeOf expr env)) && (typecheck_parameters arglist paramlist env)
-    | _, _ -> false
+and check_parameter_types params typelist env = match params, typelist with
+  | p :: p_list, t :: t_list -> types_compatible t (typeOf p env); check_parameter_types p_list t_list env
+  | [], [] -> ()
+  | [], t::_ -> raise (IncompatibleTypes (t, Unit))
+  | p::_, [] -> raise (IncompatibleTypes (Unit, (typeOf p env)))
 
-(* check if t1 is compatible with t2 (a variable of t1 can accept a t2). Undefined and Null have type Unit which is accepted by any type *)
-and types_compatible t1 t2 = t1 = t2 || t2 = Unit
+(* check if t1 is compatible with t2 (a variable of t1 can accept a t2). Undefined and Null have type Unit which is accepted by any type 
+ * If the types are not compatible it raises an exception *)
+and types_compatible t1 t2 = if (t1 != t2 && t2 != Unit) then raise (IncompatibleTypes (t1, t2))
 
-(* check if t1 is the same as t2. Undefined and Null (type Unit) are not accepted as valid types for t2 *)
-and types_identical t1 t2 = t1 = t2
+(* check if t1 is the same as t2. Undefined and Null (type Unit) are not accepted as valid types for t2
+ * If the types are not identical it raises an exception *)
+and types_identical t1 t2 = if (t1 != t2) then raise (IncompatibleTypes (t1, t2))
 

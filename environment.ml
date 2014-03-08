@@ -1,7 +1,7 @@
 (** **)
 
-open Hashtbl
 open InterpreterObjects
+open Exceptions
 
 (* Definition of the environment type *)
 type environment = 
@@ -14,7 +14,7 @@ let new_environment parent = Environment (parent, (Hashtbl.create 10));;
 (* lookup_variable_all reutrns the variable /tipe * varVal/ and the environment where it's defined *)
 let rec lookup_variable_all env varname = 
     match env with
-    | RootEnv ht -> (env, Hashtbl.find ht varname)
+    | RootEnv ht -> (try (env, Hashtbl.find ht varname) with Not_found -> raise (UndefinedVariable varname))
     | Environment (p, ht) -> try ( (env, Hashtbl.find ht varname) ) with Not_found -> lookup_variable_all p varname;;
 
 let lookup_variable env varname = let l = lookup_variable_all env varname in match l with (_, var) -> var;;

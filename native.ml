@@ -55,14 +55,42 @@ let run_native_code name params = match name with
     | "input_length" -> read_headers 0; ValInt !input_length
 
     (* int native functions *)
-    | "input" -> (match params with [ValInt nr] -> read_headers 0; ValStream (Int, Stream.from (stream_from_array !inputs.(nr) Int)))
-    | "output" -> (match params with [ValStream (t, s)] -> read_headers 0; print_stream (output_format_stream s); Undefined)
-    | "reverse" -> (match params with [ValStream (t, s)] -> read_headers 0; ValStream (t, (reverse_stream s)))
+    | "input" -> (match params with
+        | [ValInt nr] -> read_headers 0; ValStream (Int, Stream.from (stream_from_array !inputs.(nr) Int))
+        | _ -> raise (IncompatibleTypes (Unit, Unit))
+    )
+    | "output" -> (match params with 
+        | [ValStream (t, s)] -> read_headers 0; print_stream (output_format_stream s); Undefined
+        | _ -> raise (IncompatibleTypes (Unit, Unit))
+    )
+    | "reverse" -> (match params with
+        | [ValStream (t, s)] -> read_headers 0; ValStream (t, (reverse_stream s))
+        | _ -> raise (IncompatibleTypes (Unit, Unit))
+    )
 
     (* float native functions *)
-    | "input_float" -> (match params with [ValInt nr] -> read_headers 0; ValStream (Float, Stream.from (stream_from_array !inputs.(nr) Float)))
-    | "output_float" -> (match params with [ValStream (t, s)] -> read_headers 0; print_stream (output_format_stream s); Undefined)
-    | "reverse_float" -> (match params with [ValStream (t, s)] -> read_headers 0; ValStream (t, (reverse_stream s)))
+    | "input_float" -> (match params with 
+        | [ValInt nr] -> read_headers 0; ValStream (Float, Stream.from (stream_from_array !inputs.(nr) Float))
+        | _ -> raise (IncompatibleTypes (Unit, Unit))
+    )
+    | "output_float" -> (match params with 
+        | [ValStream (t, s)] -> read_headers 0; print_stream (output_format_stream s); Undefined
+        | _ -> raise (IncompatibleTypes (Unit, Unit))
+    )
+    | "reverse_float" -> (match params with
+        | [ValStream (t, s)] -> read_headers 0; ValStream (t, (reverse_stream s))
+        | _ -> raise (IncompatibleTypes (Unit, Unit))
+    )
+
+    (* type conversions *)
+    | "int_of_float" -> (match params with
+        | [ValFloat v] -> ValInt (int_of_float v)
+        | _ -> raise (IncompatibleTypes (Unit, Unit))
+    )
+    | "float_of_int" -> (match params with
+        | [ValInt v] -> ValFloat (float_of_int v)
+        | _ -> raise (IncompatibleTypes (Unit, Unit))
+    )
 
     | _ -> Null;;
 
