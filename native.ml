@@ -3,6 +3,7 @@ open Scanf
 open Exceptions
 open Printer
 open Args
+open Environment
 
 let no_of_inputs = ref 0
 and input_length = ref 0;;
@@ -65,4 +66,5 @@ let run_native_code name params = match name with
 
     | _ -> Null;;
 
-
+let register_native_function env name returnType argumentsType  =
+    put_variable env name ((Function (returnType, argumentsType)), (ValFunction (NativeFunc (returnType, name, argumentsType))));;
