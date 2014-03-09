@@ -20,13 +20,40 @@ let rec eval exp env = match exp with
   | Primitive p -> p
 
   (* Arithmetics *)
-  | PlusOperator (e1, e2) -> plus (eval e1 env) (eval e2 env)
-  | MinusOperator (e1, e2) -> minus (eval e1 env) (eval e2 env)
-  | MultiplyOperator (e1, e2) -> multiply (eval e1 env) (eval e2 env)
-  | DivOperator (e1, e2) -> div (eval e1 env) (eval e2 env)
-  | ExponentOperator (e1, e2) -> exponent (eval e1 env) (eval e2 env)
-  | ModOperator (e1, e2) -> modulo (eval e1 env) (eval e2 env)
-  | NegationOperator e -> negation (eval e env)
+  | PlusOperator (e1, e2) ->
+    types_compatible_nrop (typeOf e1 env);
+    types_compatible_nrop (typeOf e2 env);
+    plus (eval e1 env) (eval e2 env)
+
+  | MinusOperator (e1, e2) -> 
+    types_compatible_nrop (typeOf e1 env);
+    types_compatible_nrop (typeOf e2 env);
+    minus (eval e1 env) (eval e2 env)
+
+  | MultiplyOperator (e1, e2) -> 
+    types_compatible_nrop (typeOf e1 env);
+    types_compatible_nrop (typeOf e2 env);
+    multiply (eval e1 env) (eval e2 env)
+
+  | DivOperator (e1, e2) -> 
+    types_compatible_nrop (typeOf e1 env);
+    types_compatible_nrop (typeOf e2 env);
+    div (eval e1 env) (eval e2 env)
+
+  | ExponentOperator (e1, e2) -> 
+    types_compatible_nrop (typeOf e1 env);
+    types_compatible_nrop (typeOf e2 env);
+    exponent (eval e1 env) (eval e2 env)
+
+  | ModOperator (e1, e2) -> 
+    let accepted = [Int; Stream Int; Unit] in 
+    (type_is_one_of accepted accepted (typeOf e1 env);
+     type_is_one_of accepted accepted (typeOf e2 env));
+    modulo (eval e1 env) (eval e2 env)
+
+  | NegationOperator e -> 
+    types_compatible_nrop (typeOf e env);
+    negation (eval e env)
 
   (* Equality testing *)
   | Equal (e1, e2) -> equal (eval e1 env) (eval e2 env)

@@ -20,7 +20,14 @@ let rec typeOf exp env = match exp with
   | DivOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
 
   | ExponentOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
-  | ModOperator (e1, e2) -> Int
+  | ModOperator (e1, e2) -> let t1=typeOf e1 env and t2=typeOf e2 env in 
+    (match t1, t2 with
+     | Int, Int -> Int
+     | Stream Int, Stream Int -> Stream Int
+     | Stream Int, Int -> Stream Int
+     | Int, Stream Int -> Stream Int
+     | _, _ -> Unit  
+    )
 
   | Equal (_, _) -> Boolean
   | NonEqual (_, _) -> Boolean
@@ -72,7 +79,14 @@ and type_of_numeric_op t1 t2 = match t1, t2 with
   | Stream Float, Stream Int -> Stream Float
   | Stream Float, Stream Float -> Stream Float
 
-  | _, _ -> raise NotANumber
+  | Unit, _ -> Unit
+  | _, Unit -> Unit
+
+  | a, b -> let accepted = [Int; Float; Stream Int; Stream Float; Unit] in (type_is_one_of accepted accepted a; type_is_one_of accepted accepted b; Unit) 
+
+and types_compatible_nrop t =
+  let accepted = [Int; Float; Stream Int; Stream Float; Unit] in
+  type_is_one_of accepted accepted t
 
 (* given an arugmnet list, return a list of their types only *)
 and typelist_of_arglist = function
@@ -104,9 +118,9 @@ and check_parameter_types params typelist env = match params, typelist with
   | [], t::_ -> raise (IncompatibleTypes (t, Unit))
   | p::_, [] -> raise (IncompatibleTypes (Unit, (typeOf p env)))
 
-and type_is_one_of tlist t2 = match tlist with
-    | t :: tl -> if t = t2 then () else type_is_one_of tl t2 
-    | [] -> raise (IncompatibleTypesList (tlist, t2))
+and type_is_one_of tlist tlistexp t2 = match tlist with
+  | t :: tl -> if not (t = t2) then type_is_one_of tl tlistexp t2 
+  | [] -> raise (IncompatibleTypesList (tlistexp, t2))
 
 (* check if t1 is compatible with t2 (a variable of t1 can accept a t2). Undefined and Null have type Unit which is accepted by any type 
  * If the types are not compatible it raises an exception *)

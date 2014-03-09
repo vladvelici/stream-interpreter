@@ -1,10 +1,4 @@
 s1 := input(0)
 s2 := input(0)
 <<s2
-f := func (int count) int {
-    int a = <<s1
-    int b = <<s2
-    a+2*b
-}
-
-output(~f)
+output(s1+2*s2)

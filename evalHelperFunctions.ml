@@ -89,7 +89,10 @@ and exponent n1 n2 = match n1, n2 with
   | _ , _ -> Undefined
 
 and modulo n1 n2 = match n1, n2 with
-  | ValInt n1, ValInt n2 -> ValInt (n1 mod n2)
+  | ValInt v1, ValInt v2 -> ValInt (v1 mod v2)
+  | ValInt v1, ValStream (Int, s) -> ValStream (Int, Stream.from (withNextElement s (fun el -> modulo n1 el)))
+  | ValStream (Int, s), ValInt v2 -> ValStream (Int, Stream.from (withNextElement s (fun el -> modulo el n2)))
+  | ValStream (Int, s1), ValStream (Int, s2) -> ValStream (Int, Stream.from (withNextElements s1 s2 modulo))
   | _, _ -> Undefined;;
 
 (* Equality testing functions *)
