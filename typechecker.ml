@@ -92,9 +92,9 @@ and check_parameter_types params typelist env = match params, typelist with
 
 (* check if t1 is compatible with t2 (a variable of t1 can accept a t2). Undefined and Null have type Unit which is accepted by any type 
  * If the types are not compatible it raises an exception *)
-and types_compatible t1 t2 = if (t1 != t2 && t2 != Unit) then raise (IncompatibleTypes (t1, t2))
+and types_compatible t1 t2 = if not (t1 = t2 || t2 = Unit) then raise (IncompatibleTypes (t1, t2))
 
 (* check if t1 is the same as t2. Undefined and Null (type Unit) are not accepted as valid types for t2
  * If the types are not identical it raises an exception *)
-and types_identical t1 t2 = if (t1 != t2) then raise (IncompatibleTypes (t1, t2))
+and types_identical t1 t2 = if not (t1 = t2) then raise (IncompatibleTypes (t1, t2))
 
