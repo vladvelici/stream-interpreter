@@ -28,9 +28,15 @@ let _ =
           ) 
         | Empty -> ()
       with 
-      | Parsing.Parse_error -> print_string "Parsing error. Sorry. \n"; flush stdout
-      | IncompatibleTypes (t1, t2) -> print_string ("Incompatible types. Expected " ^ (string_of_type t1) ^ " but found " ^ (string_of_type t2) ^ "\n"); flush stdout
-      | IncompatibleTypesList (t1, t2) -> print_string ("Incompatible types. Expected one of " ^ (string_of_TypeList t1) ^ " but found " ^ (string_of_type t2) ^ "\n"); flush stdout
+      | Parsing.Parse_error -> Printf.eprintf "Parsing error. Sorry. \n"; flush stderr
+      | IncompatibleTypes (t1, t2) -> Printf.eprintf "Incompatible types. Expected %s but found %s.\n" (string_of_type t1) (string_of_type t2); flush stderr
+      | IncompatibleTypesList (t1, t2) -> Printf.eprintf "Incompatible types. Expected one of %s but found %s.\n"; flush stderr
+      | CannotRedefineVariable name -> Printf.eprintf "Cannot redefine variable %s.\n" name; flush stderr
+      | UndefinedVariable name -> Printf.eprintf "Variable %s is undefined.\n" name; flush stderr
+      | NotAFunction name -> Printf.eprintf "%s is not a function.\n" name; flush stderr
+      | DivisionByZero -> Printf.eprintf "Division by zero.\n"; flush stderr
+      | NotAStream -> Printf.eprintf "Not a stream.\n"; flush stderr
+      | NotANumber -> Printf.eprintf "Not a number.\n"; flush stderr
 
     done
   ) with

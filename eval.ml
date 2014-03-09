@@ -151,7 +151,6 @@ and do_assign env name expr =
   ) with Not_found -> (raise (UndefinedVariable name))
 
 (* fetch a variable by name from the given environment (or any parent environments)
- * raises UninitializedVariable if the value is Undefined
  * raise UndefinedVariable if the variable is not found in any of the environments *)
 and fetch_variable env name =
   try (
