@@ -3,7 +3,7 @@
 type output = Empty | Expression of expression
 
 and expression =
-    (* Makes the interpreter move to the next line *)
+  (* Makes the interpreter move to the next line *)
   | DeclAssign of string * tipe * expression        (* int a = 3  *)
   | CtxDeclaration of string * expression           (* a := 3 *)
   | Assignment of string * expression               (* a = 4 *)
@@ -19,29 +19,29 @@ and expression =
   | DivOperator of expression * expression          (* a / b *)
   | ExponentOperator of expression * expression     (* a ^ b *)
   | ModOperator of expression * expression          (* a % b *)
-  | NegationOperator of expression		    (* - a *)
-  
+  | NegationOperator of expression                  (* - a *)
+
   | NewStream of expression                         (* ~f or ~func(int x) int {...} *)
   | ReadStream of expression                        (*  *)
 
   (* Equality testing operators *)
-  | Equal of expression * expression		    (* a == b *)
-  | NonEqual of expression * expression		    (* a != b *)
+  | Equal of expression * expression            (* a == b *)
+  | NonEqual of expression * expression         (* a != b *)
 
   (* Order relation operators *)
-  | Less of expression * expression		    (* a < b *)
-  | Greater of expression * expression		    (* a > b *)
-  | LessEqual of expression * expression	    (* a <= b *)
-  | GreaterEqual of expression * expression	    (* a >= b *)
+  | Less of expression * expression             (* a < b *)
+  | Greater of expression * expression          (* a > b *)
+  | LessEqual of expression * expression        (* a <= b *)
+  | GreaterEqual of expression * expression     (* a >= b *)
 
   (* Boolean logic operators *)
-  | Not of expression				    (* !a *)
-  | Or of expression * expression		    (* a || b *)
-  | And of expression * expression		    (* a && b *)
+  | Not of expression                       (* !a *)
+  | Or of expression * expression           (* a || b *)
+  | And of expression * expression          (* a && b *)
 
   (* If statement operators *)
-  | If of expression * (expression list)	    			(* if ( a > b ) { a = b... } *) 
-  | IfElse of expression * (expression list) * (expression list)	(* if ( a > b ) { a = b... } Else {...} *)
+  | If of expression * (expression list)                            (* if ( a > b ) { a = b... } *) 
+  | IfElse of expression * (expression list) * (expression list)    (* if ( a > b ) { a = b... } Else {...} *)
 
   (* For Loop operator: for ( int i:=0, i < 5, i+1 ) { a = a + 2 } *)
   | ForLoop of expression * expression * expression * (expression list)

@@ -6,11 +6,14 @@ exception Eof
 }
 
 rule token = parse
-      [' ' '\t']     { token lexbuf }     (* skip blanks *)
-    | ['\n' ]  { EOL }
+    (* skip blanks *)
+    | [' ' '\t']            { token lexbuf }
 
-    (* comments *)
+    (* comments *)          
     | "//"[^'\n']*['\n']    { token lexbuf }
+    
+    | ['\n' ]               { EOL }
+
     (* assignment syntax *)
     | "="       { ASSIGN }
     | ":="      { TYPE_ASSIGN }
@@ -31,15 +34,15 @@ rule token = parse
     | '/'       { DIV }
     | '^'       { EXPONENTIAL }
     | '%'       { MODULO }
-    | "=="	{ EQUAL }
-    | "!="  { NONEQUAL }
-    | '<'	{ LESS }
-    | '>'	{ GREATER }
-    | "<="	{ LESSEQUAL }
-    | ">="	{ GREATEREQUAL }
-    | "||"	{ OR }
-    | "&&"	{ AND }
-    | '!'   { NOT }
+    | "=="      { EQUAL }
+    | "!="      { NONEQUAL }
+    | '<'       { LESS }
+    | '>'       { GREATER }
+    | "<="      { LESSEQUAL }
+    | ">="      { GREATEREQUAL }
+    | "||"      { OR }
+    | "&&"      { AND }
+    | '!'       { NOT }
 
     (* stream manipulation syntax *)
     | ":"       { COLON }
@@ -47,22 +50,23 @@ rule token = parse
     | "~"       { TILDE }
 
     (* keywords *)
-    | "true"	{ TRUE }
-    | "false"   { FALSE }
-    | "if"	{ IF }
-    | "else"	{ ELSE }
-    | "for"	{ FOR }
-    | "while"	{ WHILE }
-    | "do"	{ DO }
-    | "func"    { FUNC }
-    | "stream"  { STREAM }
-    | "null"    { NULL }
-    | "undefined" { UNDEFINED }
+    | "true"        { TRUE }
+    | "false"       { FALSE }
+    | "if"          { IF }
+    | "else"        { ELSE }
+    | "for"         { FOR }
+    | "while"       { WHILE }
+    | "do"          { DO }
+    | "func"        { FUNC }
+    | "stream"      { STREAM }
+    | "null"        { NULL }
+    | "undefined"   { UNDEFINED }
 
     (* variable types *)
-    | "int"  | "float" | "bool" as lxm { TYPE(type_of_string lxm) }
-    | ['0'-'9']+ as lxm { INT(int_of_string lxm) }
-    | ['0'-'9']+'.'['0'-'9']+ as lxm { FLOAT(float_of_string lxm) }
+    | "int"  | "float" | "bool" as lxm      { TYPE(type_of_string lxm) }
+    | ['0'-'9']+ as lxm                     { INT(int_of_string lxm) }
+    | ['0'-'9']+'.'['0'-'9']+ as lxm        { FLOAT(float_of_string lxm) }
     | ['a'-'z''A'-'Z''_']['a'-'z''A'-'Z''_''0'-'9']* as lxm { VARNAME(lxm) }
 
     | eof      { raise Eof }
+

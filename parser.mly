@@ -43,9 +43,9 @@ main:
 /* Expression */
 expr:
     | primitive                         { Primitive ($1) }
-    | numerical				{ $1 }
-    | if_statement			{ $1 }
-    | loop				{ $1 }
+    | numerical                         { $1 }
+    | if_statement                      { $1 }
+    | loop                              { $1 }
     | declaration                       { $1 }
     | VARNAME ASSIGN expr               { Assignment ($1, $3) }
     | VARNAME LPAREN vallist RPAREN     { ApplyFunction ($1, $3) }
@@ -69,39 +69,39 @@ primitive:
 /* Numerical operations */
 numerical:
     /* Arithmetics */
-    | expr PLUS expr			{ PlusOperator ($1, $3) }
-    | expr MINUS expr			{ MinusOperator ($1, $3) }
-    | expr TIMES expr			{ MultiplyOperator ($1, $3) }
-    | expr DIV expr			{ DivOperator ($1, $3) }
-    | expr EXPONENTIAL expr		{ ExponentOperator ($1, $3) }
-    | expr MODULO expr			{ ModOperator ($1, $3) }
-    | MINUS expr %prec UMINUS		{ NegationOperator ($2) }
+    | expr PLUS expr            { PlusOperator ($1, $3) }
+    | expr MINUS expr           { MinusOperator ($1, $3) }
+    | expr TIMES expr           { MultiplyOperator ($1, $3) }
+    | expr DIV expr             { DivOperator ($1, $3) }
+    | expr EXPONENTIAL expr     { ExponentOperator ($1, $3) }
+    | expr MODULO expr          { ModOperator ($1, $3) }
+    | MINUS expr %prec UMINUS   { NegationOperator ($2) }
 
     /* Equality testing */
-    | expr EQUAL expr			{ Equal ($1, $3) }
-    | expr NONEQUAL expr		{ NonEqual ($1, $3) }
+    | expr EQUAL expr           { Equal ($1, $3) }
+    | expr NONEQUAL expr        { NonEqual ($1, $3) }
 
     /* Order relations */
-    | expr LESS expr			{ Less ($1, $3) }
-    | expr GREATER expr			{ Greater ($1, $3) }
-    | expr LESSEQUAL expr		{ LessEqual ($1, $3) }
-    | expr GREATEREQUAL expr		{ GreaterEqual ($1, $3) }
+    | expr LESS expr            { Less ($1, $3) }
+    | expr GREATER expr         { Greater ($1, $3) }
+    | expr LESSEQUAL expr       { LessEqual ($1, $3) }
+    | expr GREATEREQUAL expr    { GreaterEqual ($1, $3) }
 
     /* Boolean logic */
-    | NOT expr				{ Not ($2) }
-    | expr OR expr			{ Or ($1, $3) }
-    | expr AND expr			{ And ($1, $3) }
+    | NOT expr              { Not ($2) }
+    | expr OR expr          { Or ($1, $3) }
+    | expr AND expr         { And ($1, $3) }
 
 /* If statement */
 if_statement:
-   | IF LPAREN expr RPAREN LBRACE exprSeq RBRACE	{ If ($3, $6) }
+   | IF LPAREN expr RPAREN LBRACE exprSeq RBRACE                            { If ($3, $6) }
    | IF LPAREN expr RPAREN LBRACE exprSeq RBRACE ELSE LBRACE exprSeq RBRACE { IfElse ($3, $6, $10) }
 
 /* Loops */
 loop:
-   | FOR LPAREN expr COMMA expr COMMA expr RPAREN LBRACE exprSeq RBRACE	{ ForLoop ($3, $5, $7, $10) }
-   | WHILE LPAREN expr RPAREN LBRACE exprSeq RBRACE					{ WhileLoop ($3, $6) }
-   | DO LBRACE exprSeq RBRACE WHILE LPAREN expr RPAREN					{ DoWhileLoop ($7, $3) }
+   | FOR LPAREN expr COMMA expr COMMA expr RPAREN LBRACE exprSeq RBRACE { ForLoop ($3, $5, $7, $10) }
+   | WHILE LPAREN expr RPAREN LBRACE exprSeq RBRACE                     { WhileLoop ($3, $6) }
+   | DO LBRACE exprSeq RBRACE WHILE LPAREN expr RPAREN                  { DoWhileLoop ($7, $3) }
 
 /* Matches the following:
  * int a = 3
@@ -161,8 +161,8 @@ funcexpr:
 
 /* matches lambda expressions: func(<arguments>) <return type> { <some body> }*/
 lambda:
-     | FUNC LPAREN arglist RPAREN typematch LBRACE exprSeq RBRACE { Func($5, $3, $7) }
-     | FUNC LPAREN RPAREN typematch LBRACE exprSeq RBRACE { Func ($4, [], $6) }
+     | FUNC LPAREN arglist RPAREN typematch LBRACE exprSeq RBRACE   { Func($5, $3, $7) }
+     | FUNC LPAREN RPAREN typematch LBRACE exprSeq RBRACE           { Func ($4, [], $6) }
 ;
 
 /* Stream arithmetic */
