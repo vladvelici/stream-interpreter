@@ -15,7 +15,7 @@ let rec eval exp env = match exp with
   | ApplyLambda (f, params) -> apply_function env env f params
   | ApplyFunction (name, params) -> let (decl_scope, (varType, f)) = lookup_variable_all env name
     in if (type_is_function varType) then apply_function env decl_scope (func_of_varval f) params else raise (NotAFunction name) 
-  | NewStream expr -> if type_is_function (typeOf expr env) then let f = func_of_varval (eval expr env) in create_new_stream f env else raise (NotAFunction "--")
+  | NewStream expr -> if type_is_function (typeOf expr env) then let f = func_of_varval (eval expr env) in create_new_stream f env else raise (NotAFunction "-new stream-")
   | ReadStream expr -> if type_is_stream expr env then (let stream = eval expr env in read_stream stream) else raise (NotAStream)
   | Primitive p -> p
 
@@ -23,11 +23,10 @@ let rec eval exp env = match exp with
   | PlusOperator (e1, e2) -> plus (eval e1 env) (eval e2 env)
   | MinusOperator (e1, e2) -> minus (eval e1 env) (eval e2 env)
   | MultiplyOperator (e1, e2) -> multiply (eval e1 env) (eval e2 env)
-  | DivOperator (e1, e2) -> let n = (eval e2 env) in
-    if (is_zero n) = false then (div (eval e1 env) n) else raise DivisionByZero
+  | DivOperator (e1, e2) -> div (eval e1 env) (eval e2 env)
   | ExponentOperator (e1, e2) -> exponent (eval e1 env) (eval e2 env)
   | ModOperator (e1, e2) -> modulo (eval e1 env) (eval e2 env)
-  | NegationOperator e -> (match (eval e env) with ValFloat v -> ValFloat (-.v) | ValInt v -> ValInt (-v) | _ -> raise NotANumber)
+  | NegationOperator e -> negation (eval e env)
 
   (* Equality testing *)
   | Equal (e1, e2) -> equal (eval e1 env) (eval e2 env)
@@ -94,11 +93,6 @@ let rec eval exp env = match exp with
 
 and eval_and_unit expr env = let _ = eval expr env in ()
 and eval_func_body_and_unit exprList env = let _ = eval_func_body exprList env in ()
-
-and is_zero = function
-  | ValInt n -> n = 0
-  | ValFloat n -> n = 0.0
-  | _ -> raise (NotANumber)
 
 (* Reads the next element from a stream *)
 and read_stream stream = match stream with

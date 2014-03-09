@@ -10,6 +10,7 @@ let rec typeOf exp env = match exp with
   | VarName a -> lookup_variable_type env a
   | ApplyFunction (name, _) -> return_type (lookup_variable_type env name) name
   | ApplyLambda (fnc, _) -> return_type (typeOf (Primitive (ValFunction fnc)) env) "-lambda-"
+
   | NewStream expr -> Stream (return_type (typeOf expr env) "-newstream-")
   | ReadStream expr -> return_type_stream expr env
 
@@ -18,8 +19,8 @@ let rec typeOf exp env = match exp with
   | MultiplyOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
   | DivOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
 
-  | ExponentOperator (_, _) -> Float
-  | ModOperator (_, _) -> Int
+  | ExponentOperator (e1, e2) -> let t1 = typeOf e1 env and t2 = typeOf e2 env in type_of_numeric_op t1 t2
+  | ModOperator (e1, e2) -> Int
 
   | Equal (_, _) -> Boolean
   | NonEqual (_, _) -> Boolean
@@ -31,7 +32,7 @@ let rec typeOf exp env = match exp with
   | GreaterEqual (_, _) -> Boolean
   | Not _ -> Boolean
 
-  | NegationOperator e -> let t = typeOf e env in if is_type_number t then t else raise NotANumber
+  | NegationOperator e -> let t = typeOf e env in type_of_numeric_op t t 
 
   | If (_, _) -> Unit
   | IfElse (_, _, _) -> Unit
@@ -48,16 +49,29 @@ let rec typeOf exp env = match exp with
   | Primitive (ValFunction (Func (t, arglist, _))) -> Function (t, (typelist_of_arglist arglist))
   | Primitive (ValFunction (NativeFunc (t, _, typelist))) -> Function (t, (typelist))
 
-and is_type_number t = match t with
-  | Int -> true
-  | Float -> true
-  | _ -> false
-
 and type_of_numeric_op t1 t2 = match t1, t2 with
   | Int, Int -> Int
   | Float, Int -> Float
   | Int, Float -> Float
   | Float, Float -> Float
+
+  | Stream Int, Int -> Stream Int
+  | Int, Stream Int -> Stream Int
+
+  | Stream Int, Float -> Stream Float
+  | Float, Stream Int -> Stream Float
+
+  | Stream Float, Int -> Stream Float
+  | Int, Stream Float -> Stream Float
+
+  | Stream Float, Float -> Stream Float
+  | Float, Stream Float -> Stream Float
+
+  | Stream Int, Stream Int -> Stream Int
+  | Stream Int, Stream Float -> Stream Float
+  | Stream Float, Stream Int -> Stream Float
+  | Stream Float, Stream Float -> Stream Float
+
   | _, _ -> raise NotANumber
 
 (* given an arugmnet list, return a list of their types only *)
@@ -89,6 +103,10 @@ and check_parameter_types params typelist env = match params, typelist with
   | [], [] -> ()
   | [], t::_ -> raise (IncompatibleTypes (t, Unit))
   | p::_, [] -> raise (IncompatibleTypes (Unit, (typeOf p env)))
+
+and type_is_one_of tlist t2 = match tlist with
+    | t :: tl -> if t = t2 then () else type_is_one_of tl t2 
+    | [] -> raise (IncompatibleTypesList (tlist, t2))
 
 (* check if t1 is compatible with t2 (a variable of t1 can accept a t2). Undefined and Null have type Unit which is accepted by any type 
  * If the types are not compatible it raises an exception *)

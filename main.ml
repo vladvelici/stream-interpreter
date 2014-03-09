@@ -30,6 +30,7 @@ let _ =
       with 
       | Parsing.Parse_error -> print_string "Parsing error. Sorry. \n"; flush stdout
       | IncompatibleTypes (t1, t2) -> print_string ("Incompatible types. Expected " ^ (string_of_type t1) ^ " but found " ^ (string_of_type t2) ^ "\n"); flush stdout
+      | IncompatibleTypesList (t1, t2) -> print_string ("Incompatible types. Expected one of " ^ (string_of_TypeList t1) ^ " but found " ^ (string_of_type t2) ^ "\n"); flush stdout
 
     done
   ) with
