@@ -4,25 +4,13 @@ open Printer
 open Environment
 open Eval
 open Exceptions
-open Native
 (* Root Environment *)
 
 let roottbl:((string, variable) Hashtbl.t)  = Hashtbl.create 10;;
-
 let _ = read_arguments 0;;
 
 let root = RootEnv roottbl;;
-
-register_native_function root "input_length"    Int             [];;
-register_native_function root "no_of_inputs"    Int             [];;
-register_native_function root "input"           (Stream Int)    [Int];;
-register_native_function root "input_float"     (Stream Float)  [Int];;
-register_native_function root "output"          Unit            [Stream Int];;
-register_native_function root "output_float"    Unit            [Stream Float];;
-register_native_function root "reverse"         (Stream Int)    [Stream Int];;
-register_native_function root "reverse_float"   (Stream Float)  [Stream Float];;
-register_native_function root "int_of_float"    Int             [Float];;
-register_native_function root "float_of_int"    Float           [Int];;
+Native.init root;;
 
 let _ = 
   try (

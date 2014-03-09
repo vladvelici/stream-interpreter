@@ -10,4 +10,3 @@ exception DivisionByZero;;
 exception NotAStream;;
 exception NotANumber;;
 
-

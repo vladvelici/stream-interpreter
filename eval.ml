@@ -1,6 +1,5 @@
 open InterpreterObjects
 open Environment
-open Native
 open Exceptions
 open Typechecker
 open EvalHelperFunctions
@@ -161,7 +160,7 @@ and params_to_values params env = match params with
 and apply_function call_scope decl_scope f params = match f with
   | NativeFunc (_, name, arguments) ->
     check_parameter_types params arguments call_scope;
-    run_native_code name (params_to_values params call_scope)
+    Native.run name (params_to_values params call_scope)
 
   | Func (rType, arguments, body) ->
     check_parameter_types params (typelist_of_arglist arguments) call_scope;
