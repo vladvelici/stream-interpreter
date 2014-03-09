@@ -9,6 +9,8 @@ rule token = parse
       [' ' '\t']     { token lexbuf }     (* skip blanks *)
     | ['\n' ]  { EOL }
 
+    (* comments *)
+    | "//"[^'\n']*['\n']    { token lexbuf }
     (* assignment syntax *)
     | "="       { ASSIGN }
     | ":="      { TYPE_ASSIGN }
