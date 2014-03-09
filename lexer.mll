@@ -10,7 +10,7 @@ rule token = parse
     | [' ' '\t']            { token lexbuf }
 
     (* comments *)          
-    | "//"[^'\n']*['\n']    { token lexbuf }
+    | "//"[^'\n']*          { token lexbuf }
     
     | ['\n' ]               { EOL }
 
