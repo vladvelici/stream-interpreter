@@ -1,4 +1,7 @@
+// gets the input streams from stdin
 s1 := input(0)
 s2 := input(1)
 
+// forms a stream that takes an element from s1 and substracts the double of an element from s2
+// and prints out the result
 output(s1 - 2 * s2)

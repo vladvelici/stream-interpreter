@@ -1,5 +1,8 @@
+// read input stream
 s:=input(0)
+// get rid of first two elements
 <<s
 <<s
+// print out the stream s
 output(s)
 

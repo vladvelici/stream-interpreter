@@ -1,14 +1,19 @@
+// read input streams
 s1 := input(0)
 s2 := input(1)
 
+// create a function f that takes an int c and returns an int
 func f (int c) int {
     int r
+    // if the element count is even, read from stream 1, otherwise from stream 2
     if (c%2 == 0) {
         r = <<s1
     } else {
         r = <<s2
     }
+    // return the element read
     r
 }
 
+// output a stream created by function f
 output(~f)

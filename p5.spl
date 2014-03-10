@@ -1,8 +1,14 @@
+// read input stream
 s := input(0)
 
+// create function f
 func f (int c) int {
+    // read an element from s into r
     r := <<s
+    // ignore an element from s
     <<s
     r
 }
+
+// print a stream created by function f
 output(~f)

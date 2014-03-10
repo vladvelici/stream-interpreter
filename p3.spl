@@ -1,4 +1,10 @@
+// read the first input stream into s1 and s2
 s1 := input(0)
 s2 := input(0)
+
+// get rid of first element of s2
 <<s2
+
+// form a stream of an element of s1 and doubled element of s2
+// print the result
 output(s1+2*s2)

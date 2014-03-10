@@ -97,7 +97,7 @@ let rec eval exp env = match exp with
       eval_and_unit init env2;
       while (bool_check (eval cond env2)) do
         begin
-          eval_func_body_and_unit body env2;
+          let env3 = new_environment env2 in eval_func_body_and_unit body env3;
           eval_and_unit afterthought env2
         end
       done
@@ -108,16 +108,17 @@ let rec eval exp env = match exp with
     types_compatible Boolean (typeOf condition env2);
     begin  
       while (bool_check (eval condition env2)) do
-        eval_func_body_and_unit seq env2
+        let env3 = new_environment env2 in
+        eval_func_body_and_unit seq env3
       done;
       Undefined
     end
 
   | DoWhileLoop (condition, seq) -> let env2 = new_environment env in
     types_compatible Boolean (typeOf condition env2);  
-    eval_func_body_and_unit seq env2;
+    let env3 = new_environment env2 in eval_func_body_and_unit seq env3;
     while (bool_check (eval condition env2)) do
-      eval_func_body_and_unit seq env2;
+      let env3 = new_environment env2 in eval_func_body_and_unit seq env3;
     done;
     Undefined
 
