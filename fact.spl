@@ -1,0 +1,16 @@
+s1 := input(0)
+s2 := input(0)
+
+f := func (int c) int {
+    int a
+    a = <<s1
+    int r
+    if (a != null) {
+        r = a
+    } else {
+        r = <<s2
+    }
+    r
+}
+
+output(~f)
