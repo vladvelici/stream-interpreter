@@ -132,5 +132,7 @@ let greaterEqual n1 n2 = match n1, n2 with
 (* Check if the expression is of type boolean and return it if it is *)
 let bool_check t = match t with
   | ValBoolean b -> b
+  | Undefined -> false
+  | Null -> false
   | _ -> raise (IncompatibleTypes (Boolean, Unit));;
 

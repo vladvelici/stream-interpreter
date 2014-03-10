@@ -84,13 +84,16 @@ let rec eval exp env = match exp with
      | _, _ -> raise (IncompatibleTypes (Unit, Unit)))
 
   (* If statement operators *)
-  | If (e1, e2) -> if bool_check (eval e1 env) then (eval_func_body e2 env)  else Undefined
-  | IfElse (e1, e2, e3) -> if bool_check (eval e1 env) then (eval_func_body e2 env) else (eval_func_body e3 env)
+  | If (e1, e2) -> types_compatible Boolean (typeOf e1 env); if bool_check (eval e1 env) then let _ = (eval_func_body e2 env) in Undefined else Undefined
+  | IfElse (e1, e2, e3) -> types_compatible Boolean (typeOf e1 env); if bool_check (eval e1 env) then
+      let _ = (eval_func_body e2 env) in Undefined
+    else 
+      let _ = (eval_func_body e3 env) in Undefined
 
   (* Loops *)
   | ForLoop (init, cond, afterthought, body) -> begin 
       let env2 = new_environment env in
-      types_identical Boolean (typeOf cond env2);
+      types_compatible Boolean (typeOf cond env2);
       eval_and_unit init env2;
       while (bool_check (eval cond env2)) do
         begin
@@ -102,7 +105,7 @@ let rec eval exp env = match exp with
 
   | WhileLoop (condition, seq) ->
     let env2 = new_environment env in
-    types_identical Boolean (typeOf condition env2);
+    types_compatible Boolean (typeOf condition env2);
     begin  
       while (bool_check (eval condition env2)) do
         eval_func_body_and_unit seq env2
@@ -111,7 +114,7 @@ let rec eval exp env = match exp with
     end
 
   | DoWhileLoop (condition, seq) -> let env2 = new_environment env in
-    types_identical Boolean (typeOf condition env2);  
+    types_compatible Boolean (typeOf condition env2);  
     eval_func_body_and_unit seq env2;
     while (bool_check (eval condition env2)) do
       eval_func_body_and_unit seq env2;
