@@ -155,14 +155,14 @@ vallist:
 /* matches things like func <function name>(<arguments>) <return type> { <some-body> } */
 funcexpr:
     | FUNC VARNAME LPAREN arglist RPAREN typematch LBRACE exprSeq RBRACE {
-            CtxDeclaration ($2, (Primitive (ValFunction (Func ($6, $4, $8)))))
+            CtxDeclaration ($2, (Primitive (ValFunction (Func (NullEnvironment, $6, $4, $8)))))
         }
 ;
 
 /* matches lambda expressions: func(<arguments>) <return type> { <some body> }*/
 lambda:
-     | FUNC LPAREN arglist RPAREN typematch LBRACE exprSeq RBRACE   { Func($5, $3, $7) }
-     | FUNC LPAREN RPAREN typematch LBRACE exprSeq RBRACE           { Func ($4, [], $6) }
+     | FUNC LPAREN arglist RPAREN typematch LBRACE exprSeq RBRACE   { Func (NullEnvironment, $5, $3, $7) }
+     | FUNC LPAREN RPAREN typematch LBRACE exprSeq RBRACE           { Func (NullEnvironment, $4, [], $6) }
 ;
 
 /* Stream arithmetic */

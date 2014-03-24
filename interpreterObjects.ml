@@ -1,6 +1,11 @@
-(** Definitions of the interpreter objects **)
+(* Definition of the environment type *)
+type environment = 
+  | RootEnv of (string, variable) Hashtbl.t
+  | Environment of environment * (string, variable) Hashtbl.t
+  | NullEnvironment
 
-type output = Empty | Expression of expression
+(** Definitions of the interpreter objects **)
+and output = Empty | Expression of expression
 
 and expression =
   (* Makes the interpreter move to the next line *)
@@ -55,7 +60,7 @@ and expression =
 and tipe = Int | Float | Boolean | Function of tipe * (tipe list) | Stream of tipe | Unit
 and argument = Argument of string * tipe
 
-and func = Func of tipe * (argument list) * (expression list) | NativeFunc of tipe * string * (tipe list)
+and func = Func of environment * tipe * (argument list) * (expression list) | NativeFunc of tipe * string * (tipe list)
 
 and varValue =
   | ValInt of int

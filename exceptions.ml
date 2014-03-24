@@ -9,4 +9,5 @@ exception NotAFunction of string;;
 exception DivisionByZero;;
 exception NotAStream;;
 exception NotANumber;;
+exception NullEnvironmentFound;;
 

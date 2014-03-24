@@ -12,11 +12,12 @@ let rec eval exp env = match exp with
   | CtxDeclaration (name, expr) -> do_declare_assig env name (typeOf expr env) expr
   | Assignment (name, expr) -> do_assign env name expr
   | VarName name -> fetch_variable env name
-  | ApplyLambda (f, params) -> apply_function env env f params
-  | ApplyFunction (name, params) -> let (decl_scope, (varType, f)) = lookup_variable_all env name
-    in if (type_is_function varType) then apply_function env decl_scope (func_of_varval f) params else raise (NotAFunction name) 
+  | ApplyLambda (f, params) -> apply_function env f params
+  | ApplyFunction (name, params) -> let (varType, f) = lookup_variable env name
+    in if (type_is_function varType) then apply_function env (func_of_varval f) params else raise (NotAFunction name) 
   | NewStream expr -> if type_is_function (typeOf expr env) then let f = func_of_varval (eval expr env) in create_new_stream f env else raise (NotAFunction "-new stream-")
   | ReadStream expr -> if type_is_stream expr env then (let stream = eval expr env in read_stream stream) else raise (NotAStream)
+  | Primitive (ValFunction (Func (NullEnvironment, return_type, arg_list, body))) -> ValFunction (Func (env, return_type, arg_list, body)) 
   | Primitive p -> p
 
   (* Arithmetics *)
@@ -131,7 +132,7 @@ and read_stream stream = match stream with
   | _ -> raise NotAStream
 
 (* create new stream (returns ValStream) *)
-and create_new_stream f env = let stream_type = match f with Func (t, _, _) -> t | NativeFunc (t, _, _) -> t
+and create_new_stream f env = let stream_type = match f with Func (_, t, _, _) -> t | NativeFunc (t, _, _) -> t
   in ValStream (stream_type, Stream.from (internal_new_stream env f))
 
 (* helper function to return the function from a varValue *)
@@ -183,12 +184,12 @@ and params_to_values params env = match params with
   | [] -> []
 
 (* calls the given function in the given call_scope. Note that the function scope inherits the declaration scope, not the call scope. *)
-and apply_function call_scope decl_scope f params = match f with
+and apply_function call_scope f params = match f with
   | NativeFunc (_, name, arguments) ->
     check_parameter_types params arguments call_scope;
     Native.run name (params_to_values params call_scope)
 
-  | Func (rType, arguments, body) ->
+  | Func (decl_scope, rType, arguments, body) ->
     check_parameter_types params (typelist_of_arglist arguments) call_scope;
     let func_scope = new_environment decl_scope
     in apply_param_bindings func_scope call_scope params arguments;

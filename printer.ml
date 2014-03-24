@@ -64,7 +64,7 @@ and string_of_primitive p =  match p with
       | Undefined -> "Undefined"
 
 and string_of_func = function
-  | Func (tipe, arg, exprList) -> "func (" ^ (string_of_ArgList arg) ^ ") " ^ (string_of_type tipe) ^
+  | Func (_, tipe, arg, exprList) -> "func (" ^ (string_of_ArgList arg) ^ ") " ^ (string_of_type tipe) ^
                                   " { \n" ^ (string_of_exprList "\n" exprList) ^ "\n}"
   | NativeFunc (tipe, _, typeList) -> "native func (" ^ (string_of_TypeList typeList) ^ ") " ^ (string_of_type tipe) 
 

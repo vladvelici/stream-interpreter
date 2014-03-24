@@ -53,7 +53,7 @@ let rec typeOf exp env = match exp with
   | Primitive (Null) -> Unit
   | Primitive (Undefined) -> Unit
   | Primitive (ValStream (t, _)) -> Stream t
-  | Primitive (ValFunction (Func (t, arglist, _))) -> Function (t, (typelist_of_arglist arglist))
+  | Primitive (ValFunction (Func (_, t, arglist, _))) -> Function (t, (typelist_of_arglist arglist))
   | Primitive (ValFunction (NativeFunc (t, _, typelist))) -> Function (t, (typelist))
 
 and type_of_numeric_op t1 t2 = match t1, t2 with
