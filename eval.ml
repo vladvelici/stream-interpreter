@@ -166,7 +166,9 @@ and fetch_variable env name =
 (* binds the variables from the parameters into arguments in the func_scope environment.
  * Evaluates the values of parameters in the call_scope. *)
 and apply_param_bindings func_scope call_scope params arguments = match params, arguments with
-  | expr :: param_list, Argument (name, arg_type) :: arg_list -> put_variable func_scope name ((arg_type, (eval expr call_scope)):variable)
+  | expr :: param_list, Argument (name, arg_type) :: arg_list ->
+        put_variable func_scope name ((arg_type, (eval expr call_scope)):variable);
+        apply_param_bindings func_scope call_scope param_list arg_list
   | [], [] -> ()
   | _, _ -> raise (IncompatibleTypes (Unit, Unit)) 
 
