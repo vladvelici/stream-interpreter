@@ -1,43 +1,85 @@
-mid := func(int c) int {
-    c = c+1
-    m := c / 2
-    m + (c%2)
+sum := func(stream:int str) int {
+    s := 0
+    int a = <<str
+    while (a != null) {
+        s = s + a
+        a = <<str
+    }
+    s
 }
+
+ones := func (int howMany) stream:int {
+    ~func(int c) int {
+        result := 1
+        if (c >= howMany) {
+            result = undefined
+        }
+        result
+    }
+}
+
+useMiddle := func(stream:int mid) stream:int {
+    endNext := false
+    ~func(int count) int {
+        result:=1
+        if (count > 0) {
+            read := <<mid
+            if (read==null) {
+                if (endNext == false) {
+                    result = 1
+                    endNext = true
+                } else {
+                    result = undefined
+                }
+            }
+        }
+        result
+    }
+}
+
+cutFirst := func(stream:int s) stream:int {
+    <<s
+    s
+}
+
+func coef (int n) stream:int {
+
+    stream:int re = null
+
+    if (n<=2) {
+        re = ones(n)
+    } else { 
+        b1 := coef(n-1)
+        b2 := cutFirst(coef(n-1))
+        re = useMiddle(b1+b2)
+    }
+
+    re
+
+}
+
 
 len := input_length()
 f := func(int count) int {
-    a := input(0)
-    b := reverse(input(1))
+    int value
+    if (count < len) {
+        a := input(0)
+        b := reverse(input(1))
 
-    count1 := count + 1
+        count1 := count + 1
 
-    trunc := len - count - 1
+        trunc := len - count - 1
 
-    for (i:=0, i<trunc, i=i+1) {
-        <<b
-    }
-    middle:=mid(count)
-
-    coef := func(int coef_count) int {
-        ret := coef_count + 1
-        if (ret > middle) {
-            ret = 2 * middle - ret + count%2
+        for (i:=0, i<trunc, i=i+1) {
+            <<b
         }
-        if (coef_count > count + 1) {
-            ret = undefined
-        } else { 
-            if (coef_count > count) {
-                ret = middle
-            }
-        }
-        ret
+
+        coefStream := coef(count1)
+        output(coef(count1)) 
+
+        value = sum(coefStream*a*b)
     }
-    output(~coef) 
-    r:=1
-    if (count > 10){
-        r=undefined
-    }
-    r
+    value
 }
 
 output(~f)
