@@ -58,6 +58,7 @@ func coef (int n) stream:int {
 
 }
 
+output(useMiddle(input(0)))
 
 len := input_length()
 f := func(int count) int {
