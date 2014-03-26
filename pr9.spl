@@ -1,0 +1,14 @@
+s1 := input(0)
+s2 := input(0)
+output (~func (int count) int {
+    int r
+    if (count%2 == 0) {
+        <<s2
+        r = << s2
+    } else {
+        r = << s1
+        <<s1
+    }
+    r
+})
+

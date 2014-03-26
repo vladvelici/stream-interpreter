@@ -1,0 +1,31 @@
+
+     truncate b as required
+    for (i:=0, i<trunc, i=i+1) {
+        <<b
+    }
+    
+    sum := 0
+    <<b
+    t := a * b
+
+    <<t
+    middle := mid(count)
+    coef := func(int c) int {
+        result := middle
+
+        if (c < middle) {
+            result = c
+       }
+
+        if (c > middle) {
+            result = 2 * mid - count
+        }
+        result
+    }
+    coefStream := ~coef
+    resultStream := coefStream * t
+    for (i:=0, i<count, i=i+1) {
+        sum = sum + <<resultStream        
+    }
+
+    sum

@@ -1,0 +1,5 @@
+a := input(0)
+b := input(1)
+c := input(2)
+
+output(a+b-c)

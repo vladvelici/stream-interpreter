@@ -1,0 +1,43 @@
+mid := func(int c) int {
+    c = c+1
+    m := c / 2
+    m + (c%2)
+}
+
+len := input_length()
+f := func(int count) int {
+    a := input(0)
+    b := reverse(input(1))
+
+    count1 := count + 1
+
+    trunc := len - count - 1
+
+    for (i:=0, i<trunc, i=i+1) {
+        <<b
+    }
+    middle:=mid(count)
+
+    coef := func(int coef_count) int {
+        ret := coef_count + 1
+        if (ret > middle) {
+            ret = 2 * middle - ret + count%2
+        }
+        if (coef_count > count + 1) {
+            ret = undefined
+        } else { 
+            if (coef_count > count) {
+                ret = middle
+            }
+        }
+        ret
+    }
+    output(~coef) 
+    r:=1
+    if (count > 10){
+        r=undefined
+    }
+    r
+}
+
+output(~f)

@@ -1,0 +1,9 @@
+makeStream := func (int inputNo) stream:int {
+    s := input(inputNo)
+    ~func (int c) int {
+        <<s
+        <<s
+    }
+}
+output(makeStream(0))
+

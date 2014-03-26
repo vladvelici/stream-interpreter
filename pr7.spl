@@ -1,0 +1,6 @@
+s1 := input(0)
+s2 := input(0)
+<<s1
+<<s2
+<<s2
+output(s1+s2)
