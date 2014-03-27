@@ -23,8 +23,8 @@ useMiddle := func(stream:int mid) stream:int {
     ~func(int count) int {
         result:=1
         if (count > 0) {
-            read := <<mid
-            if (read==null) {
+            result = <<mid
+            if (result==null) {
                 if (endNext == false) {
                     result = 1
                     endNext = true
@@ -58,8 +58,6 @@ func coef (int n) stream:int {
 
 }
 
-output(useMiddle(input(0)))
-
 len := input_length()
 f := func(int count) int {
     int value
@@ -76,11 +74,10 @@ f := func(int count) int {
         }
 
         coefStream := coef(count1)
-        output(coef(count1)) 
-
         value = sum(coefStream*a*b)
     }
     value
 }
 
 output(~f)
+
